@@ -1,0 +1,17 @@
+{
+    "cSpell.words": [
+        "Etoro",
+        "isin"
+    ],
+    "editor.formatOnSave": true,
+    "cSpell.enableFiletypes": [
+        "dart"
+    ],
+    "cSpell.language": "en,en-GB,en-US",
+    "dart.lineLength": 120,
+    "[dart]": {
+        "editor.rulers": [
+            120
+        ],
+    }
+}

@@ -5,6 +5,7 @@ import "package:broker_to_tax/transaction_type.dart";
 import "package:country_code/country_code.dart";
 import "package:csv/csv.dart";
 
+import "../entities/broker_operation.dart";
 import "../entities/gains.dart";
 
 class EtoroClosedPosition {
@@ -95,7 +96,7 @@ class EtoroClosedPosition {
   }
 }
 
-class EtoroClosedPositions extends ListBase<EtoroClosedPosition> {
+class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements BrokerOperations {
   List<EtoroClosedPosition> _positions = [];
 
   @override
@@ -123,7 +124,8 @@ class EtoroClosedPositions extends ListBase<EtoroClosedPosition> {
     _positions = csvPositions.skip(skipFirstRow ? 1 : 0).map(EtoroClosedPosition.fromCsvRow).toList();
   }
 
-  List<Gain> toGains() {
-    return _positions.map((e) => e.toGain()).toList();
+  @override
+  Iterable<Gain> toGains() {
+    return _positions.map((e) => e.toGain());
   }
 }

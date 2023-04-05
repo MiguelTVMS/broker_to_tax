@@ -1,14 +1,23 @@
 import "dart:io";
 
+import "entities/broker_operation.dart";
+import "entities/exchange.dart";
 import "entities/gains.dart";
 import "etoro/closed_positions.dart";
 
 class BrokerToTax {
+  /// The path to the file to parse.
   String filePath;
+  String exchangeDirectory;
 
-  BrokerToTax(this.filePath);
+  BrokerToTax(this.filePath, this.exchangeDirectory);
 
   Future<void> run() async {
+    BrokerOperations etoroOperations = await readDataSource();
+    await calculateGains(etoroOperations);
+  }
+
+  Future<EtoroClosedPositions> readDataSource() async {
     var file = File(filePath);
 
     if (!await file.exists()) {
@@ -17,9 +26,16 @@ class BrokerToTax {
 
     var etoroPositions = EtoroClosedPositions.fromCsv(csvString: await file.readAsString());
     print("Found ${etoroPositions.length} eToro Positions");
+    return etoroPositions;
+  }
 
-    var gains = etoroPositions.toGains();
-    print("Found ${gains.byCrypto.length} Crypto gains with a net profit of ${gains.byCrypto.netProfit}");
+  Future<void> calculateGains(BrokerOperations brokerOperations) async {
+    // Wait for the exchange rates to be loaded.
+    await HistoricalExchangeRates.initialize(exchangeDirectory);
+
+    var gains = brokerOperations.toGains();
+    print(
+        "Found ${gains.byCrypto.length} Crypto gains with a net profit of ${gains.byCrypto.netProfit} converted to EUR ${gains.byCrypto.getNetProfitIn(MoneySymbol.eur)}");
     print("Found ${gains.byStock.length} Stock gains with a net profit of ${gains.byStock.netProfit}");
     print("Found ${gains.byCFD.length} CFD gains with a net profit of ${gains.byCFD.netProfit}");
     print("Found ${gains.byETF.length} ETF gains with a net profit of ${gains.byETF.netProfit}");

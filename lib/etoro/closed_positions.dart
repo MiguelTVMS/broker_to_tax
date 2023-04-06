@@ -82,17 +82,16 @@ class EtoroClosedPosition {
 
   Gain toGain() {
     return Gain(
-      name: name,
-      openDate: openDate,
-      closeDate: closeDate,
-      units: units,
-      openRate: openRate,
-      closeRate: closeRate,
-      feesAndDividends: rolloverFeesAndDividends,
-      type: transactionType,
-      sourceCountry: CountryCode.parse(country ?? "US"),
-      counterpartyCountry: CountryCode.US,
-    );
+        name: name,
+        openDate: openDate,
+        closeDate: closeDate,
+        units: units,
+        openRate: openRate,
+        closeRate: closeRate,
+        feesAndDividends: rolloverFeesAndDividends,
+        type: transactionType,
+        sourceCountry: CountryCode.parse(country ?? "US"),
+        counterpartyCountry: CountryCode.US);
   }
 }
 
@@ -125,7 +124,8 @@ class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements Brok
   }
 
   @override
-  Iterable<Gain> toGains() {
-    return _positions.map((e) => e.toGain());
+  Gains toGains() {
+    var gainsList = _positions.map((e) => e.toGain());
+    return Gains()..addAll(gainsList);
   }
 }

@@ -5,5 +5,5 @@ abstract class BrokerOperation {
 }
 
 abstract class BrokerOperations {
-  Iterable<Gain> toGains();
+  Gains toGains();
 }

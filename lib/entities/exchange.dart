@@ -2,6 +2,8 @@ import "dart:collection";
 import "dart:convert";
 import "dart:io";
 
+import "../parsers.dart";
+
 enum MoneySymbol {
   usd("USD"),
   eur("EUR");
@@ -62,16 +64,14 @@ class HistoricalExchangeRates extends MapBase<String, ExchangeRate> {
   Future<void> _fillHistoricalData(Iterable<FileSystemEntity> files) async {
     for (var file in files) {
       Map<String, dynamic> jsonObject = jsonDecode(await (file as File).readAsString());
-      jsonObject.forEach((key, value) {
+      jsonObject.forEach((kDate, vExchangeRates) {
         var exchangeRate = ExchangeRate();
-        var valueMap = value as Map<String, dynamic>;
-        valueMap.forEach((key, value) {
-          exchangeRate[MoneySymbol.fromString(key)] = value;
+        var valueMap = vExchangeRates as Map<String, dynamic>;
+        valueMap.forEach((kMoneySymbol, vDouble) {
+          exchangeRate[MoneySymbol.fromString(kMoneySymbol)] = DynamicParsers.toDouble(vDouble);
         });
-        this[key] = exchangeRate;
+        this[kDate] = exchangeRate;
       });
-      var exchangeRate = jsonObject;
-      //this[exchangeRate.date] = exchangeRate;
     }
   }
 

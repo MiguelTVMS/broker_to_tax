@@ -35,22 +35,38 @@ class BrokerToTax {
 
     var gains = brokerOperations.toGains();
     print(
-        "Found ${gains.byCrypto.length} Crypto gains with a net profit of ${gains.byCrypto.netProfit} converted to EUR ${gains.byCrypto.getNetProfitIn(MoneySymbol.eur)}");
-    print("Found ${gains.byStock.length} Stock gains with a net profit of ${gains.byStock.netProfit}");
-    print("Found ${gains.byCFD.length} CFD gains with a net profit of ${gains.byCFD.netProfit}");
-    print("Found ${gains.byETF.length} ETF gains with a net profit of ${gains.byETF.netProfit}");
-    print("Found ${gains.length} total gains with a net profit of ${gains.netProfit}");
+        "Found ${gains.length} total gains with a net profit of ${gains.netProfit} USD converted to ${gains.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${gains.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${gains.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
+
+    var gainsByCrypto = gains.byCrypto;
+    print(
+        "Found ${gainsByCrypto.length} Crypto gains with a net profit of ${gainsByCrypto.netProfit} USD converted to ${gainsByCrypto.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${gainsByCrypto.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${gainsByCrypto.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
+
+    var gainsByStock = gains.byStock;
+    print(
+        "Found ${gainsByStock.length} Stock gains with a net profit of ${gainsByStock.netProfit} USD converted to ${gainsByStock.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${gainsByStock.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${gainsByStock.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
+
+    var gainsByCFD = gains.byCFD;
+    print(
+        "Found ${gainsByCFD.length} CFD gains with a net profit of ${gainsByCFD.netProfit} USD converted to ${gainsByCFD.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${gainsByCFD.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${gainsByCFD.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
+
+    var gainsByETF = gains.byETF;
+    print(
+        "Found ${gainsByETF.length} ETF gains with a net profit of ${gainsByETF.netProfit} USD converted to ${gainsByETF.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${gainsByETF.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${gainsByETF.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
 
     var stockGains = [...gains.byStock, ...gains.byETF];
-    print("Found ${stockGains.length} Stock gains by country with a net profit of ${stockGains.netProfit}");
-    var stockGainsByCountry = [...gains.byStock, ...gains.byETF].groupBy((gain) => gain.sourceCountry);
     print(
-        "Found ${stockGainsByCountry.length} countries with stock gains with a net profit of ${stockGainsByCountry.netProfit}");
+        "Found ${stockGains.length} Stock gains by country with a net profit of ${stockGains.netProfit} USD converted to ${stockGains.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${stockGains.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${stockGains.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
+
+    var stockGainsByCountryReport = [...gains.byStock, ...gains.byETF].groupBy((gain) => gain.sourceCountry);
+    print(
+        "Found ${stockGainsByCountryReport.length} countries with stock gains with a net profit of ${stockGainsByCountryReport.netProfit} USD converted to ${stockGainsByCountryReport.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${stockGainsByCountryReport.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${stockGainsByCountryReport.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
 
     var cryptoGainsReport = gains.byCrypto.groupBy((gain) => gain.name);
-    print("Found ${cryptoGainsReport.length} Crypto gains with a net profit of ${cryptoGainsReport.netProfit}");
+    print(
+        "Found ${cryptoGainsReport.length} Crypto gains with a net profit of ${cryptoGainsReport.netProfit} USD converted to ${cryptoGainsReport.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${cryptoGainsReport.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${cryptoGainsReport.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
 
     var cfdGainsReport = gains.byCFD.groupBy((gain) => gain.type);
-    print("Found ${cfdGainsReport.length} CFD gains with a net profit of ${cfdGainsReport.netProfit}");
+    print(
+        "Found ${cfdGainsReport.length} CFD gains with a net profit of ${cfdGainsReport.netProfit} USD converted to ${cfdGainsReport.getNetProfitIn(MoneySymbol.eur)} ${MoneySymbol.eur} with an average exchange rate of ${cfdGainsReport.getAverageOpenExchangeRate(MoneySymbol.eur)} on open and ${cfdGainsReport.getAverageCloseExchangeRate(MoneySymbol.eur)} on close.");
   }
 }

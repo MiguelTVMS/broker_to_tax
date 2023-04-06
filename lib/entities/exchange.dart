@@ -4,16 +4,16 @@ import "dart:io";
 
 import "../parsers.dart";
 
-enum MoneySymbol {
+enum Currency {
   usd("USD"),
   eur("EUR");
 
-  const MoneySymbol(this.name);
+  const Currency(this.name);
 
   final String name;
 
-  static MoneySymbol fromString(String name) {
-    return MoneySymbol.values.firstWhere((e) => e.name == name);
+  static Currency fromString(String name) {
+    return Currency.values.firstWhere((e) => e.name == name);
   }
 
   @override
@@ -22,105 +22,98 @@ enum MoneySymbol {
   }
 }
 
-/// A map of exchange rates for a specific date.
-/// This is a singleton class that is initialized once.
-/// To initialize, call [HistoricalExchangeRates.initialize] with await.
-class HistoricalExchangeRates extends MapBase<String, ExchangeRate> {
-  final Map<String, ExchangeRate> _map = {};
-
+/// Historical exchange rates.
+///
+/// To initialize, call [HistoricalExchangeRates.addFromJsonFilesInDirectory] with await.
+/// This is a singleton implementation of [DailyExchangeRates].
+class HistoricalExchangeRates extends DailyExchangeRates {
   static HistoricalExchangeRates? _instance;
+  HistoricalExchangeRates._();
+  factory HistoricalExchangeRates() => _instance ??= HistoricalExchangeRates._();
 
-  static get isInitialized => _instance != null;
-
-  /// Returns the exchange rate for the given [date].
-  ///
-  /// [date] The date of the exchange rate in the format "yyyy-MM-dd".
-  /// Returns null if no exchange rate is found.
-  static ExchangeRate getByDateString(String date) {
-    if (!isInitialized) throw Exception("HistoricalExchangeRates is not initialized.");
-    if (!_instance!.containsKey(date)) throw Exception("No exchange rate found for date $date");
-    return _instance![date]!;
-  }
-
-  /// Returns the exchange rate for the given [date].
-  ///
-  /// [date] The date of the exchange rate.
-  /// Returns null if no exchange rate is found.
-  static ExchangeRate getByDate(DateTime date) => getByDateString(date.toString().substring(0, 10));
-
-  static Future<void> initialize(String directory) async {
+  Future<void> addFromJsonFilesInDirectory(String directory) async {
     if (directory.isEmpty) throw Exception("Directory should not be empty.");
 
-    var instance = HistoricalExchangeRates();
-    var exchangeFiles = await instance._getExchangeRatesFiles(directory);
-    await instance._fillHistoricalData(exchangeFiles);
-    HistoricalExchangeRates._instance = instance;
-  }
+    var exchangeFiles =
+        await Directory(directory).list(recursive: false).where((event) => event.path.endsWith(".json")).toList();
 
-  Future<Iterable<FileSystemEntity>> _getExchangeRatesFiles(String directory) async {
-    return await Directory(directory).list(recursive: false).where((event) => event.path.endsWith(".json")).toList();
+    for (var file in exchangeFiles) {
+      HistoricalExchangeRates().addFromJsonString(await (file as File).readAsString());
+    }
   }
+}
 
-  Future<void> _fillHistoricalData(Iterable<FileSystemEntity> files) async {
-    for (var file in files) {
-      Map<String, dynamic> jsonObject = jsonDecode(await (file as File).readAsString());
-      jsonObject.forEach((kDate, vExchangeRates) {
-        var exchangeRate = ExchangeRate();
-        var valueMap = vExchangeRates as Map<String, dynamic>;
-        valueMap.forEach((kMoneySymbol, vDouble) {
-          exchangeRate[MoneySymbol.fromString(kMoneySymbol)] = DynamicParsers.toDouble(vDouble);
-        });
-        this[kDate] = exchangeRate;
+/// A map of exchange rates for a specific date.
+///
+/// To initialize, call [DailyExchangeRates.initialize] with await.
+class DailyExchangeRates {
+  final Map<String, ExchangeRate> _map = {};
+
+  void addFromJsonString(String json) {
+    var jsonObject = jsonDecode(json);
+    jsonObject.forEach((kDate, vExchangeRates) {
+      var exchangeRate = ExchangeRate();
+      var valueMap = vExchangeRates as Map<String, dynamic>;
+      valueMap.forEach((kMoneySymbol, vDouble) {
+        exchangeRate[Currency.fromString(kMoneySymbol)] = DynamicParsers.toDouble(vDouble);
       });
+
+      // Add base exchange rate if not present.
+      if (!exchangeRate.containsKey(ExchangeRate.baseExchangeRate)) exchangeRate[ExchangeRate.baseExchangeRate] = 1.0;
+
+      this[kDate] = exchangeRate;
+    });
+  }
+
+  double convert(double value, Currency to, DateTime when, [Currency from = ExchangeRate.baseExchangeRate]) {
+    if (from == to) return value;
+    var exchangeRate = this[when];
+
+    if (exchangeRate == null) throw Exception("No exchange rate found for date $when.");
+    return exchangeRate.convert(value, to, from);
+  }
+
+  String _getKeyString(Object? key) {
+    if (key is DateTime) {
+      return key.toString().substring(0, 10);
+    } else if (key is String) {
+      return key;
+    } else {
+      throw Exception("Key must be of type DateTime or String.");
     }
   }
 
-  @override
-  ExchangeRate? operator [](Object? key) => _map[key];
+  ExchangeRate? operator [](Object key) => _map[_getKeyString(key)];
 
-  @override
-  void operator []=(String key, ExchangeRate value) => _map[key] = value;
-
-  @override
-  void clear() => _map.clear();
-
-  @override
-  Iterable<String> get keys => _map.keys;
-
-  @override
-  ExchangeRate? remove(Object? key) => _map.remove(key);
+  void operator []=(Object key, ExchangeRate value) => _map[_getKeyString(key)] = value;
 }
 
-class ExchangeRate extends MapBase<MoneySymbol, double> {
-  final Map<MoneySymbol, double> _map = {};
+class ExchangeRate extends MapBase<Currency, double> {
+  final Map<Currency, double> _map = {};
+  static const Currency baseExchangeRate = Currency.usd;
 
   @override
   double? operator [](Object? key) => _map[key];
 
   @override
-  void operator []=(MoneySymbol key, double value) => _map[key] = value;
+  void operator []=(Currency key, double value) => _map[key] = value;
 
   @override
   void clear() => _map.clear();
 
   @override
-  Iterable<MoneySymbol> get keys => _map.keys;
+  Iterable<Currency> get keys => _map.keys;
 
   @override
   double? remove(Object? key) => _map.remove(key);
 
-  double? convert(double? value, MoneySymbol to) {
-    if (value == null) return null;
-
-    if (to == MoneySymbol.usd) return value;
-
-    return value * this[to]!;
-  }
+  double convert(double value, Currency to, [Currency from = baseExchangeRate]) =>
+      (from == to) ? value : (value / this[from]!) * this[to]!;
 
   static fromJson(String s) {
     var exchangeRate = ExchangeRate();
     var json = jsonDecode(s);
-    exchangeRate[MoneySymbol.eur] = json["EUR"];
+    exchangeRate[Currency.eur] = json["EUR"];
     return exchangeRate;
   }
 }

@@ -31,10 +31,10 @@ class Gain {
   double get netProfit => _netProfit ??= closeValue - openValue + feesAndDividends;
 
   ExchangeRate? _openExchangeRate;
-  ExchangeRate get openExchangeRate => _openExchangeRate ??= HistoricalExchangeRates.getByDate(openDate);
+  ExchangeRate get openExchangeRate => _openExchangeRate ??= DailyExchangeRates()[openDate]!;
 
   ExchangeRate? _closeExchangeRate;
-  ExchangeRate get closeExchangeRate => _closeExchangeRate ??= HistoricalExchangeRates.getByDate(closeDate);
+  ExchangeRate get closeExchangeRate => _closeExchangeRate ??= DailyExchangeRates()[openDate]!;
 
   Gain(
       {required this.name,
@@ -48,15 +48,15 @@ class Gain {
       required this.sourceCountry,
       required this.counterpartyCountry});
 
-  double getOpenValueIn(MoneySymbol symbol) => openExchangeRate.convert(openValue, symbol)!;
+  double getOpenValueIn(Currency symbol) => openExchangeRate.convert(openValue, symbol);
 
-  double getCloseValueIn(MoneySymbol symbol) => closeExchangeRate.convert(closeValue, symbol)!;
+  double getCloseValueIn(Currency symbol) => closeExchangeRate.convert(closeValue, symbol);
 
-  double getFeesAndDividendsIn(MoneySymbol symbol) => closeExchangeRate.convert(feesAndDividends, symbol)!;
+  double getFeesAndDividendsIn(Currency symbol) => closeExchangeRate.convert(feesAndDividends, symbol);
 
-  double getGrossProfitIn(MoneySymbol symbol) => getCloseValueIn(symbol) - getOpenValueIn(symbol);
+  double getGrossProfitIn(Currency symbol) => getCloseValueIn(symbol) - getOpenValueIn(symbol);
 
-  double getNetProfitIn(MoneySymbol symbol) =>
+  double getNetProfitIn(Currency symbol) =>
       getCloseValueIn(symbol) - getOpenValueIn(symbol) + getFeesAndDividendsIn(symbol);
 }
 
@@ -91,13 +91,13 @@ class Gains extends ListBase<Gain> {
   double get netProfit => calculateNetProfit(this);
   double get totalFeesAndDividends => calculateTotalFeesAndDividends(this);
 
-  double getTotalOpenValueIn(MoneySymbol symbol) => calculateTotalOpenValueIn(this, symbol);
-  double getTotalCloseValueIn(MoneySymbol symbol) => calculateTotalCloseValueIn(this, symbol);
-  double getGrossProfitIn(MoneySymbol symbol) => calculateGrossProfitIn(this, symbol);
-  double getNetProfitIn(MoneySymbol symbol) => calculateNetProfitIn(this, symbol);
-  double getTotalFeesAndDividendsIn(MoneySymbol symbol) => calculateTotalFeesAndDividendsIn(this, symbol);
-  double getAverageOpenExchangeRate(MoneySymbol symbol) => calculateAverageOpenExchangeRate(this, symbol);
-  double getAverageCloseExchangeRate(MoneySymbol symbol) => calculateAverageCloseExchangeRate(this, symbol);
+  double getTotalOpenValueIn(Currency symbol) => calculateTotalOpenValueIn(this, symbol);
+  double getTotalCloseValueIn(Currency symbol) => calculateTotalCloseValueIn(this, symbol);
+  double getGrossProfitIn(Currency symbol) => calculateGrossProfitIn(this, symbol);
+  double getNetProfitIn(Currency symbol) => calculateNetProfitIn(this, symbol);
+  double getTotalFeesAndDividendsIn(Currency symbol) => calculateTotalFeesAndDividendsIn(this, symbol);
+  double getAverageOpenExchangeRate(Currency symbol) => calculateAverageOpenExchangeRate(this, symbol);
+  double getAverageCloseExchangeRate(Currency symbol) => calculateAverageCloseExchangeRate(this, symbol);
 
   static Gains getByTransactionTypes(Iterable<Gain> gains, Iterable<TransactionType> transactionTypes) =>
       Gains()..addAll(gains.where((gain) => transactionTypes.contains(gain.type)));
@@ -120,36 +120,36 @@ class Gains extends ListBase<Gain> {
   static double calculateTotalFeesAndDividends(Iterable<Gain> gains) =>
       gains.fold(0, (double sum, Gain gain) => sum + gain.feesAndDividends);
 
-  static double calculateTotalOpenValueIn(Iterable<Gain> gains, MoneySymbol symbol) =>
+  static double calculateTotalOpenValueIn(Iterable<Gain> gains, Currency symbol) =>
       gains.fold(0, (double sum, Gain gain) => sum + gain.getOpenValueIn(symbol));
 
-  static double calculateTotalCloseValueIn(Iterable<Gain> gains, MoneySymbol symbol) =>
+  static double calculateTotalCloseValueIn(Iterable<Gain> gains, Currency symbol) =>
       gains.fold(0, (double sum, Gain gain) => sum + gain.getCloseValueIn(symbol));
 
-  static double calculateGrossProfitIn(Iterable<Gain> gains, MoneySymbol symbol) =>
+  static double calculateGrossProfitIn(Iterable<Gain> gains, Currency symbol) =>
       gains.fold(0, (double sum, Gain gain) => sum + gain.getGrossProfitIn(symbol));
 
-  static double calculateNetProfitIn(Iterable<Gain> gains, MoneySymbol symbol) =>
+  static double calculateNetProfitIn(Iterable<Gain> gains, Currency symbol) =>
       gains.fold(0, (double sum, Gain gain) => sum + gain.getNetProfitIn(symbol));
 
-  static double calculateTotalFeesAndDividendsIn(Iterable<Gain> gains, MoneySymbol symbol) =>
+  static double calculateTotalFeesAndDividendsIn(Iterable<Gain> gains, Currency symbol) =>
       gains.fold(0, (double sum, Gain gain) => sum + gain.getFeesAndDividendsIn(symbol));
 
-  static double calculateAverageOpenExchangeRate(Iterable<Gain> gains, MoneySymbol symbol) {
+  static double calculateAverageOpenExchangeRate(Iterable<Gain> gains, Currency symbol) {
     double total = 0;
     double totalUnits = 0;
     for (Gain gain in gains) {
-      total += gain.units * gain.openExchangeRate.convert(1, symbol)!;
+      total += gain.units * gain.openExchangeRate.convert(1, symbol);
       totalUnits += gain.units;
     }
     return total / totalUnits;
   }
 
-  static double calculateAverageCloseExchangeRate(Iterable<Gain> gains, MoneySymbol symbol) {
+  static double calculateAverageCloseExchangeRate(Iterable<Gain> gains, Currency symbol) {
     double total = 0;
     double totalUnits = 0;
     for (Gain gain in gains) {
-      total += gain.units * gain.closeExchangeRate.convert(1, symbol)!;
+      total += gain.units * gain.closeExchangeRate.convert(1, symbol);
       totalUnits += gain.units;
     }
     return total / totalUnits;
@@ -174,14 +174,14 @@ extension GainsExtension on Iterable<Gain> {
   double get netProfit => Gains.calculateNetProfit(this);
   double get totalFeesAndDividends => Gains.calculateTotalFeesAndDividends(this);
 
-  double getTotalOpenValueIn(MoneySymbol symbol) => Gains.calculateTotalOpenValueIn(this, symbol);
-  double getTotalCloseValueIn(MoneySymbol symbol) => Gains.calculateTotalCloseValueIn(this, symbol);
-  double getGrossProfitIn(MoneySymbol symbol) => Gains.calculateGrossProfitIn(this, symbol);
-  double getNetProfitIn(MoneySymbol symbol) => Gains.calculateNetProfitIn(this, symbol);
-  double getTotalFeesAndDividendsIn(MoneySymbol symbol) => Gains.calculateTotalFeesAndDividendsIn(this, symbol);
+  double getTotalOpenValueIn(Currency symbol) => Gains.calculateTotalOpenValueIn(this, symbol);
+  double getTotalCloseValueIn(Currency symbol) => Gains.calculateTotalCloseValueIn(this, symbol);
+  double getGrossProfitIn(Currency symbol) => Gains.calculateGrossProfitIn(this, symbol);
+  double getNetProfitIn(Currency symbol) => Gains.calculateNetProfitIn(this, symbol);
+  double getTotalFeesAndDividendsIn(Currency symbol) => Gains.calculateTotalFeesAndDividendsIn(this, symbol);
 
-  double getAverageCloseExchangeRate(MoneySymbol symbol) => Gains.calculateAverageCloseExchangeRate(this, symbol);
-  double getAverageOpenExchangeRate(MoneySymbol symbol) => Gains.calculateAverageOpenExchangeRate(this, symbol);
+  double getAverageCloseExchangeRate(Currency symbol) => Gains.calculateAverageCloseExchangeRate(this, symbol);
+  double getAverageOpenExchangeRate(Currency symbol) => Gains.calculateAverageOpenExchangeRate(this, symbol);
 
   //Gains toGains() => Gains()..addAll(this);
 }
@@ -196,18 +196,18 @@ extension MapGainsExtension<K> on Map<K, List<Gain>> {
   double get totalFeesAndDividends =>
       values.fold(0, (double sum, List<Gain> gains) => sum + Gains.calculateTotalFeesAndDividends(gains));
 
-  double getTotalOpenValueIn(MoneySymbol symbol) =>
+  double getTotalOpenValueIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + Gains.calculateTotalOpenValueIn(gains, symbol));
-  double getTotalCloseValueIn(MoneySymbol symbol) =>
+  double getTotalCloseValueIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + Gains.calculateTotalCloseValueIn(gains, symbol));
-  double getGrossProfitIn(MoneySymbol symbol) =>
+  double getGrossProfitIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + Gains.calculateGrossProfitIn(gains, symbol));
-  double getNetProfitIn(MoneySymbol symbol) =>
+  double getNetProfitIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + Gains.calculateNetProfitIn(gains, symbol));
-  double getTotalFeesAndDividendsIn(MoneySymbol symbol) =>
+  double getTotalFeesAndDividendsIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + Gains.calculateTotalFeesAndDividendsIn(gains, symbol));
-  double getAverageCloseExchangeRate(MoneySymbol symbol) =>
+  double getAverageCloseExchangeRate(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + Gains.calculateAverageCloseExchangeRate(gains, symbol));
-  double getAverageOpenExchangeRate(MoneySymbol symbol) =>
+  double getAverageOpenExchangeRate(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + Gains.calculateAverageOpenExchangeRate(gains, symbol));
 }

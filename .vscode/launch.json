@@ -5,14 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Dart",
+            "name": "Run eToro",
             "type": "dart",
             "request": "launch",
             "program": "bin/main.dart",
             "args": [
                 "--file",
                 "${workspaceFolder}${pathSeparator}.sample_data${pathSeparator}etoro.csv",
+                "--exchange-directory",
+                "${workspaceFolder}${pathSeparator}data${pathSeparator}exchange",
             ]
-        }
+        },
+        {
+            "name": "Run help",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/main.dart",
+            "args": [
+                "--help"
+            ]
+        },
     ]
 }

@@ -1,10 +1,11 @@
-import "package:broker_to_tax/parsers.dart";
-import "package:broker_to_tax/transaction_type.dart";
 import "package:country_code/country_code.dart";
 
+import "../entities/broker_operation.dart";
 import "../entities/gains.dart";
+import "../parsers.dart";
+import "../transaction_type.dart";
 
-class EtoroClosedPosition {
+class EtoroClosedPosition implements BrokerOperation {
   int positionId;
   String action;
   double amount;
@@ -74,6 +75,7 @@ class EtoroClosedPosition {
         notes: csvRow[17]);
   }
 
+  @override
   Gain toGain() {
     return Gain(
       name: action,

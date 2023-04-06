@@ -1,5 +1,7 @@
 # Broker to Tax
 
+[![Dart](https://github.com/MiguelTVMS/broker_to_tax/actions/workflows/dart.yaml/badge.svg?event=push)](https://github.com/MiguelTVMS/broker_to_tax/actions/workflows/dart.yaml)
+
 A simple cli application that transforms information from brokers to the Portuguese tax information.
 
 > **Warning**

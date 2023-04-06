@@ -38,3 +38,7 @@ doc/api/
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# Ignore copiled files
+bin/brokertotax
+bin/brokertotax.exe

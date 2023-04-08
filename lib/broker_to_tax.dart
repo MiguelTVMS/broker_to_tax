@@ -24,7 +24,7 @@ class BrokerToTax {
       throw Exception("File does not exist: $filePath");
     }
 
-    var etoroPositions = EtoroClosedPositions.fromCsv(csvString: await file.readAsString());
+    var etoroPositions = EtoroClosedPositions.fromCsv(await file.readAsString());
     print("Found ${etoroPositions.length} eToro Positions");
     return etoroPositions;
   }

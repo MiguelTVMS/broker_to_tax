@@ -25,7 +25,8 @@ class EtoroClosedPosition implements BrokerOperation {
   String? isin;
   String? notes;
 
-  String? get country => isin?.substring(0, 2);
+  String get name => action.replaceFirst("Buy", "").replaceFirst("Sell", "").trim();
+  String? get country => (isin!.isNotEmpty) ? isin?.substring(0, 2) : null;
   TransactionType get transactionType => {
         "stocks": TransactionType.stock,
         "cfd": TransactionType.cfd,

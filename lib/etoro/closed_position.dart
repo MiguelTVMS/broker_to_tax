@@ -3,7 +3,7 @@ import "package:country_code/country_code.dart";
 import "../entities/broker_operation.dart";
 import "../entities/gains.dart";
 import "../parsers.dart";
-import "../transaction_type.dart";
+import "../entities/transaction_type.dart";
 
 class EtoroClosedPosition implements BrokerOperation {
   int positionId;

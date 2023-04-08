@@ -1,10 +1,8 @@
-import "dart:collection";
 import "dart:core";
 
 import "package:broker_to_tax/entities/exchange.dart";
+import "package:broker_to_tax/entities/transaction_type.dart";
 import "package:country_code/country_code.dart";
-
-import "../transaction_type.dart";
 
 class Gain {
   String name;

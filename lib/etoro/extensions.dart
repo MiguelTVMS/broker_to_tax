@@ -1,4 +1,4 @@
-import "../transaction_type.dart";
+import "../entities/transaction_type.dart";
 import "closed_position.dart";
 
 extension TransactionTypeParsing on TransactionType {

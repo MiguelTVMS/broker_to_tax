@@ -1,8 +1,4 @@
 import "dart:collection";
-
-import "package:broker_to_tax/parsers.dart";
-import "package:broker_to_tax/transaction_type.dart";
-import "package:country_code/country_code.dart";
 import "package:csv/csv.dart";
 
 import "../entities/broker_operation.dart";

@@ -124,8 +124,5 @@ class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements Brok
   }
 
   @override
-  Gains toGains() {
-    var gainsList = _positions.map((e) => e.toGain());
-    return Gains()..addAll(gainsList);
-  }
+  Iterable<Gain> toGains() => _positions.map((e) => e.toGain());
 }

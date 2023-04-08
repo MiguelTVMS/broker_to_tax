@@ -2,7 +2,7 @@ import "package:broker_to_tax/entities/exchange.dart";
 import "package:test/test.dart";
 
 void main() {
-  group('Echange:', () {
+  group("Exchange:", () {
     var jsonString =
         "{\"2022-12-29\":{\"EUR\":0.93232},\"2022-12-30\":{\"EUR\":0.93225},\"2022-12-31\":{\"EUR\":0.93278}}";
 

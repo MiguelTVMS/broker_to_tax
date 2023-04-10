@@ -84,6 +84,9 @@ jobs:
       - name: Copy data folder
         run: cp -r data build/data
 
+      - name: Copy license
+        run: cp LICENSE build
+
       - name: Install dependencies
         run: dart pub get
 

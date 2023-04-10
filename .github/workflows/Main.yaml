@@ -62,6 +62,7 @@ jobs:
             binary: brokertotax.exe
           - os: macos-latest
             target: macos-x64
+            binary: brokertotax
 
     runs-on: ${{ matrix.os }}
 
@@ -79,22 +80,22 @@ jobs:
             ${{ runner.os }}-pub-
 
       - name: Generate build folder
-        run: mkdir build
+        run: mkdir ${{ github.workspace }}/build
 
       - name: Copy data folder
-        run: cp -r data build/data
+        run: cp -r  ${{ github.workspace }}/data  ${{ github.workspace }}/build/data
 
       - name: Copy license
-        run: cp LICENSE build
+        run: cp  ${{ github.workspace }}/LICENSE  ${{ github.workspace }}/build
 
       - name: Install dependencies
         run: dart pub get
 
       - name: Build release
-        run: dart compile exe bin/main.dart -o build/${{ matrix.binary }}
+        run: dart compile exe  ${{ github.workspace }}/bin/main.dart -o  ${{ github.workspace }}/build/${{ matrix.binary }}
 
       - name: Upload release
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: brokertotax-${{ matrix.target }}
-          path: build/**/*
+          path: ${{ github.workspace }}/build/**/*

@@ -10,6 +10,7 @@
             "request": "launch",
             "program": "bin/main.dart",
             "args": [
+                "etoro",
                 "--file",
                 "${workspaceFolder}${pathSeparator}.sample_data${pathSeparator}etoro.csv",
                 "--exchange-directory",
@@ -17,12 +18,22 @@
             ]
         },
         {
-            "name": "Run help",
+            "name": "Run Global Help",
             "type": "dart",
             "request": "launch",
             "program": "bin/main.dart",
             "args": [
                 "--help"
+            ]
+        },
+        {
+            "name": "Run eToro Help",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/main.dart",
+            "args": [
+                "help",
+                "etoro"
             ]
         },
         {

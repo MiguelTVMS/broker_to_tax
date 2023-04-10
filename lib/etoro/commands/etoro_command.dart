@@ -1,39 +1,35 @@
 import "dart:io";
 
-import "entities/broker_operation.dart";
-import "entities/exchange.dart";
-import "entities/gains.dart";
-import "etoro/closed_positions.dart";
+import "../../entities/broker_operation.dart";
+import "../../entities/exchange.dart";
+import "../../entities/gains.dart";
+import "../closed_positions.dart";
+import "base_command.dart";
 
-class BrokerToTax {
-  /// The path to the file to parse.
-  String filePath;
-  String exchangeDirectory;
+class EtoroCommand extends BaseCommand {
+  @override
+  String get description => "Convert eToro data to a format that can be imported into tax software";
 
-  BrokerToTax(this.filePath, this.exchangeDirectory);
+  @override
+  String get name => "etoro";
 
-  Future<void> run() async {
-    BrokerOperations etoroOperations = await readDataSource();
-    await calculateGains(etoroOperations);
-  }
+  EtoroCommand() : super();
 
   Future<EtoroClosedPositions> readDataSource() async {
-    var file = File(filePath);
-
-    if (!await file.exists()) {
-      throw Exception("File does not exist: $filePath");
-    }
+    var file = File(sourceFile!);
 
     var etoroPositions = EtoroClosedPositions.fromCsv(await file.readAsString());
     print("Found ${etoroPositions.length} eToro Positions");
     return etoroPositions;
   }
 
-  Future<void> calculateGains(BrokerOperations brokerOperations) async {
-    // Wait for the exchange rates to be loaded.
-    await HistoricalExchangeRates().addFromJsonFilesInDirectory(exchangeDirectory);
+  @override
+  Future<void> run() async {
+    await super.run();
 
-    var gains = brokerOperations.toGains();
+    BrokerOperations etoroOperations = await readDataSource();
+
+    var gains = etoroOperations.toGains();
     print(
         "Found ${gains.length} total gains with a net profit of ${gains.netProfit} USD converted to ${gains.getNetProfitIn(Currency.eur)} ${Currency.eur} with an average exchange rate of ${gains.getAverageOpenExchangeRate(Currency.eur)} on open and ${gains.getAverageCloseExchangeRate(Currency.eur)} on close.");
 

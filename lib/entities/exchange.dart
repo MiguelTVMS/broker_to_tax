@@ -31,12 +31,10 @@ class HistoricalExchangeRates extends DailyExchangeRates {
   HistoricalExchangeRates._();
   factory HistoricalExchangeRates() => _instance ??= HistoricalExchangeRates._();
 
-  Future<void> addFromJsonFilesInDirectory(String directory) async {
-    if (directory.isEmpty) throw Exception("Directory should not be empty.");
-
-    var exchangeFiles =
-        await Directory(directory).list(recursive: false).where((event) => event.path.endsWith(".json")).toList();
-
+  /// Adds exchange rates from a list of JSON files.
+  ///
+  /// The files in [exchangeFiles] must contain a JSON object with the date as key and the exchange rates as value.
+  Future<void> addFromJsonFilesInDirectory(Iterable<FileSystemEntity> exchangeFiles) async {
     for (var file in exchangeFiles) {
       HistoricalExchangeRates().addFromJsonString(await (file as File).readAsString());
     }

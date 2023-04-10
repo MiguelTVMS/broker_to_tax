@@ -28,7 +28,7 @@
 					"exe",
 					"bin\\main.dart",
 					"-o",
-					"bin\\brokertotax.exe"
+					"build\\brokertotax.exe"
 				],
 			},
 			"args": [

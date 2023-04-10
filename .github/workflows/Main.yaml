@@ -46,47 +46,52 @@ jobs:
       - name: Run tests
         run: dart test
 
-  # build:
-  #   name: Build
-  #   if: startsWith(github.ref, 'refs/tags/')
-  #   needs: [test]
-  #   strategy:
-  #     matrix:
-  #       #os: [ubuntu-latest, windows-latest, macos-latest]
-  #       os: [ubuntu-latest]
-  #       include:
-  #         - os: ubuntu-latest
-  #           target: linux-x64
-  #           binary: brokertotax
-  #         - os: windows-latest
-  #           target: windows-x64
-  #           binary: brokertotax.exe
-  #         - os: macos-latest
-  #           target: macos-x64
+  build:
+    name: Build
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [test]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            target: linux-x64
+            binary: brokertotax
+          - os: windows-latest
+            target: windows-x64
+            binary: brokertotax.exe
+          - os: macos-latest
+            target: macos-x64
 
-  #   runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
-  #   steps:
-  #     - uses: actions/checkout@v3
+    steps:
+      - uses: actions/checkout@v3
 
-  #     - uses: dart-lang/setup-dart@v1
+      - uses: dart-lang/setup-dart@v1
 
-  #     - name: Cache dependencies
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: ~/.pub-cache
-  #         key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-pub-
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.pub-cache
+          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
 
-  #     - name: Install dependencies
-  #       run: dart pub get
+      - name: Generate build folder
+        run: mkdir build
 
-  #     - name: Build release
-  #       run: dart compile exe bin/main.dart -o build/main
+      - name: Copy data folder
+        run: cp -r data build/data
 
-  #     - name: Upload release
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: main-${{ matrix.target }}
-  #         path: build/main
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Build release
+        run: dart compile exe bin/main.dart -o build/${{ matrix.binary }}
+
+      - name: Upload release
+        uses: actions/upload-artifact@v2
+        with:
+          name: brokertotax-${{ matrix.target }}
+          path: build/**/*

@@ -52,6 +52,19 @@ void main() {
 
       expect(positionCloseValue, gainsCloseValue);
     });
+    test("Date parse is correct", () {
+      var positions = EtoroClosedPositions.fromCsv(csvString);
+      var position = positions.firstWhere((element) => element.positionId == 2316622589);
+
+      // 04/11/2022 13:31:25
+      var expectedOpenDate = DateTime(2022, 11, 4, 13, 31, 25);
+
+      // 21/12/2022 15:49:30
+      var expectedCloseDate = DateTime(2022, 12, 21, 15, 49, 30);
+
+      expect(position.openDate, expectedOpenDate);
+      expect(position.closeDate, expectedCloseDate);
+    });
     test("Has Stock position", () {
       var positions = EtoroClosedPositions.fromCsv(csvString);
       var gains = positions.toGains();

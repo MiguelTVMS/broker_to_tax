@@ -1,66 +1,39 @@
 import "dart:core";
-import "dart:mirrors";
 
 import "package:broker_to_tax/entities/exchange.dart";
 import "package:broker_to_tax/entities/transaction_type.dart";
 import "package:country_code/country_code.dart";
 import "package:csv/csv.dart";
 import "package:logging/logging.dart";
-import "csv_property.dart";
 
 class Gain {
-  @CsvProperty("Name")
   String name;
-
-  @CsvProperty("Open Date")
   DateTime openDate;
-
-  @CsvProperty("Close Date")
   DateTime closeDate;
-
-  @CsvProperty("Units")
   double units;
-
-  @CsvProperty("Open Rate")
   double openRate;
-
-  @CsvProperty("Close Rate")
   double closeRate;
-
-  @CsvProperty("Fees & Dividends")
   double feesAndDividends;
-
-  @CsvProperty("Type")
   TransactionType type;
-
-  @CsvProperty("Source Country")
   CountryCode sourceCountry;
-
-  @CsvProperty("Counterparty Country")
   CountryCode counterpartyCountry;
 
   double? _openValue;
-  @CsvProperty("Open Value")
   double get openValue => _openValue ??= units * openRate;
 
   double? _closeValue;
-  @CsvProperty("Close Value")
   double get closeValue => _closeValue ??= units * closeRate;
 
   double? _grossProfit;
-  @CsvProperty("Gross Profit")
   double get grossProfit => _grossProfit ??= closeValue - openValue;
 
   double? _netProfit;
-  @CsvProperty("Net Profit")
   double get netProfit => _netProfit ??= closeValue - openValue + feesAndDividends;
 
   ExchangeRate? _openExchangeRate;
-  //@GainCsvProperty("Open Exchange Rate")
   ExchangeRate get openExchangeRate => _openExchangeRate ??= HistoricalExchangeRates()[openDate]!;
 
   ExchangeRate? _closeExchangeRate;
-  //@GainCsvProperty("Close Exchange Rate")
   ExchangeRate get closeExchangeRate => _closeExchangeRate ??= HistoricalExchangeRates()[openDate]!;
 
   Gain(
@@ -75,19 +48,14 @@ class Gain {
       required this.sourceCountry,
       required this.counterpartyCountry});
 
-  @CsvProperty("Converted Open Value", currencyParameterIndex: 0)
   double getOpenValueIn(Currency symbol) => openExchangeRate.convert(openValue, symbol);
 
-  @CsvProperty("Converted Close Value", currencyParameterIndex: 0)
   double getCloseValueIn(Currency symbol) => closeExchangeRate.convert(closeValue, symbol);
 
-  @CsvProperty("Converted Fees and Dividends", currencyParameterIndex: 0)
   double getFeesAndDividendsIn(Currency symbol) => closeExchangeRate.convert(feesAndDividends, symbol);
 
-  @CsvProperty("Converted Gross Profit", currencyParameterIndex: 0)
   double getGrossProfitIn(Currency symbol) => getCloseValueIn(symbol) - getOpenValueIn(symbol);
 
-  @CsvProperty("Converted Net Profit", currencyParameterIndex: 0)
   double getNetProfitIn(Currency symbol) =>
       getCloseValueIn(symbol) - getOpenValueIn(symbol) + getFeesAndDividendsIn(symbol);
 }
@@ -147,38 +115,62 @@ extension GainsExtension on Iterable<Gain> {
     _log.fine("Generating CSV for $length gains in $currency");
 
     List<List<dynamic>> csvRows = <List<dynamic>>[];
-    Map<String, CsvProperty> columns = <String, CsvProperty>{};
-
-    var classMirror = reflectClass(Gain);
-    for (var v in classMirror.declarations.values
-        .where((e) => e.metadata.where((m) => m.reflectee is CsvProperty).isNotEmpty)) {
-      _log.finer("Found GainCsvProperty metadata in ${v.simpleName}");
-      var name = MirrorSystem.getName(v.simpleName);
-      columns[name] = v.metadata.where((meta) => meta.reflectee is CsvProperty).first.reflectee as CsvProperty;
-      _log.finest("Added column $name named ${columns[name]}");
-    }
+    List<String> headerColumns = <String>[
+      "name",
+      "Open Date",
+      "Close Date",
+      "Units",
+      "OpenRate",
+      "CloseRate",
+      "Fees and Dividends",
+      "Type",
+      "Source Country",
+      "Counterparty Country",
+      "Open Value",
+      "Close Value",
+      "Gross Profit",
+      "Net Profit",
+      "Open $currency ExchangeRate",
+      "Close $currency ExchangeRate",
+      "Open Value in $currency",
+      "Close Value in $currency",
+      "Fees and Dividends in $currency",
+      "Gross Profit in $currency",
+      "Net Profit in $currency"
+    ];
 
     if (addHeader) {
       _log.fine("Adding header");
-      csvRows.add(columns.values.map((e) => e.name).toList());
+      csvRows.add(headerColumns);
     }
 
-    forEach((gain) {
-      var gainMirror = reflect(gain);
-      var csvCols = <dynamic>[];
-      columns.forEach((key, value) {
-        if (value.isMethod) {
-          //TODO: Support more than one parameter
-          var params = <dynamic>[currency];
-          var methodMirror = gainMirror.invoke(Symbol(key), params);
-          csvCols.add(methodMirror.reflectee);
-        } else {
-          var variableMirror = gainMirror.getField(Symbol(key));
-          csvCols.add(variableMirror.reflectee);
-        }
-      });
-      csvRows.add(csvCols);
-    });
+    for (Gain gain in this) {
+      List<dynamic> csvColumns = <dynamic>[
+        gain.name,
+        gain.openDate,
+        gain.closeDate,
+        gain.units.toStringAsFixed(2),
+        gain.openRate.toStringAsFixed(2),
+        gain.closeRate.toStringAsFixed(2),
+        gain.feesAndDividends.toStringAsFixed(2),
+        gain.type,
+        gain.sourceCountry.alpha2,
+        gain.counterpartyCountry.alpha2,
+        gain.openValue.toStringAsFixed(2),
+        gain.closeValue.toStringAsFixed(2),
+        gain.grossProfit.toStringAsFixed(2),
+        gain.netProfit.toStringAsFixed(2),
+        gain.openExchangeRate[currency],
+        gain.closeExchangeRate[currency],
+        gain.getOpenValueIn(currency).toStringAsFixed(2),
+        gain.getCloseValueIn(currency).toStringAsFixed(2),
+        gain.getFeesAndDividendsIn(currency).toStringAsFixed(2),
+        gain.getGrossProfitIn(currency).toStringAsFixed(2),
+        gain.getNetProfitIn(currency).toStringAsFixed(2)
+      ];
+
+      csvRows.add(csvColumns);
+    }
 
     return ListToCsvConverter().convert(csvRows);
   }

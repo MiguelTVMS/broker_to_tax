@@ -47,7 +47,7 @@ class EtoroCommand extends BaseCommand {
     _log.fine("Getting $transactionType transactions");
     var output = gains.getByTransactionType(transactionType);
     _log.finer(
-        "Found ${output.length} $transactionType gains with a net profit of ${output.netProfit} USD converted to ${output.getNetProfitIn(currency)} ${currency} with an average exchange rate of ${output.getAverageOpenExchangeRate(currency)} on open and ${output.getAverageCloseExchangeRate(currency)} on close.");
+        "Found ${output.length} $transactionType gains with a net profit of ${output.netProfit} USD converted to ${output.getNetProfitIn(currency)} $currency with an average exchange rate of ${output.getAverageOpenExchangeRate(currency)} on open and ${output.getAverageCloseExchangeRate(currency)} on close.");
     _log.fine("Writing $transactionType transactions to file");
     var filename = "${transactionType.toString().toLowerCase()}_gains.csv";
     await File(filename).writeAsString(output.toCsvString(currency));

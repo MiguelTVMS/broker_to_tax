@@ -2,6 +2,8 @@ import "dart:collection";
 import "dart:convert";
 import "dart:io";
 
+import "package:logging/logging.dart";
+
 import "../parsers.dart";
 
 enum Currency {
@@ -27,6 +29,8 @@ enum Currency {
 /// To initialize, call [HistoricalExchangeRates.addFromJsonFilesInDirectory] with await.
 /// This is a singleton implementation of [DailyExchangeRates].
 class HistoricalExchangeRates extends DailyExchangeRates {
+  static final _log = Logger("HistoricalExchangeRates");
+
   static HistoricalExchangeRates? _instance;
   HistoricalExchangeRates._();
   factory HistoricalExchangeRates() => _instance ??= HistoricalExchangeRates._();
@@ -35,7 +39,9 @@ class HistoricalExchangeRates extends DailyExchangeRates {
   ///
   /// The files in [exchangeFiles] must contain a JSON object with the date as key and the exchange rates as value.
   Future<void> addFromJsonFilesInDirectory(Iterable<FileSystemEntity> exchangeFiles) async {
+    _log.fine("Adding exchange rates from ${exchangeFiles.length} files.");
     for (var file in exchangeFiles) {
+      _log.finer("Adding exchange rates from file $file.");
       HistoricalExchangeRates().addFromJsonString(await (file as File).readAsString());
     }
   }
@@ -45,15 +51,21 @@ class HistoricalExchangeRates extends DailyExchangeRates {
 ///
 /// To initialize, call [DailyExchangeRates.initialize] with await.
 class DailyExchangeRates {
+  static final _log = Logger("DailyExchangeRates");
+
   final Map<String, ExchangeRate> _map = {};
 
   void addFromJsonString(String json) {
     var jsonObject = jsonDecode(json);
+    var count = 0;
     jsonObject.forEach((kDate, vExchangeRates) {
       var exchangeRate = ExchangeRate();
       var valueMap = vExchangeRates as Map<String, dynamic>;
+      _log.finest("Found ${valueMap.length} exchange rates for $kDate");
       valueMap.forEach((kMoneySymbol, vDouble) {
+        _log.finest("Adding exchange rate for $kMoneySymbol: $vDouble on $kDate");
         exchangeRate[Currency.fromString(kMoneySymbol)] = DynamicParsers.toDouble(vDouble);
+        count++;
       });
 
       // Add base exchange rate if not present.
@@ -61,9 +73,11 @@ class DailyExchangeRates {
 
       this[kDate] = exchangeRate;
     });
+    _log.fine("Added $count exchange rates.");
   }
 
   double convert(double value, Currency to, DateTime when, [Currency from = ExchangeRate.baseExchangeRate]) {
+    _log.finest("Converting $value $from to $to on $when");
     if (from == to) return value;
     var exchangeRate = this[when];
 

@@ -9,12 +9,17 @@
             "type": "dart",
             "request": "launch",
             "program": "bin/main.dart",
+            "env": {
+                "LOG_LEVEL": "FINEST"
+            },
             "args": [
                 "etoro",
                 "--file",
                 "${workspaceFolder}${pathSeparator}.sample_data${pathSeparator}etoro.csv",
                 "--exchange-directory",
                 "${workspaceFolder}${pathSeparator}data${pathSeparator}exchange",
+                "-l",
+                "finest"
             ]
         },
         {

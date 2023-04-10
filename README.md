@@ -12,11 +12,43 @@ A simple cli application that transforms information from brokers to the Portugu
 
 ## How to use it
 
-TODO
+The tool is very simple, you must provide the file where the source operations are available in csv format. Read the [eToro](#etoro) section in [Supported Brokers](#supported-brokers) to know how to generate the csv.
+
+```shell
+brokertotax etoro -f "path/to/etoro_closed_positions.csv"
+```
+
+The command line application has a help that can help you in more advanced use cases. For this use the included help
+
+For the global help.
+
+```shell
+brokertotax -h
+```
+
+For the etoro specific help.
+
+```shell
+brokertotax etoro -h
+```
 
 ## Supported Brokers
 
 This first version is being developed to support eToro. But the idea is that new brokers can be added by forks. The code is being created to be simple to add a broker.
+
+### eToro
+
+How to get the operations in eToro:
+
+1. Go to the [Account Statement](https://www.etoro.com/documents/accountstatement) page.
+2. Select the last year option.
+3. Click on create.
+4. Click on the green document icon with "xls" written inside it.
+5. Save the file.
+6. Open the file using excel and go to the Closed Positions sheet.
+7. Go to File » Save As and choose CSV as format.
+8. Click on save. An alert will rise telling that it will only save the current sheet since CSV doesn't support multiple sheets, click Ok.
+9. Run the command as specified in [How to use it](#how-to-use-it) section.
 
 ## Output
 

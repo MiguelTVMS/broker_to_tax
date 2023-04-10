@@ -42,3 +42,6 @@ doc/api/
 # Ignore copiled files
 bin/brokertotax
 bin/brokertotax.exe
+
+#Ignore output files
+*.csv

@@ -1,5 +1,6 @@
 import "dart:collection";
 import "package:csv/csv.dart";
+import "package:logging/logging.dart";
 
 import "../entities/broker_operation.dart";
 import "../entities/gains.dart";
@@ -7,6 +8,7 @@ import "closed_position.dart";
 
 class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements BrokerOperations {
   List<EtoroClosedPosition> _positions = [];
+  static final _log = Logger("BaseCommand");
 
   @override
   get length => _positions.length;
@@ -27,6 +29,7 @@ class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements Brok
   }
 
   EtoroClosedPositions.fromCsv(String csvString, [bool skipFirstRow = true]) {
+    _log.fine("Parsing CSV string");
     var csvPositions = CsvToListConverter().convert(csvString);
 
     // TODO: Create a mapping between the csv columns and the EtoroClosedPosition fields

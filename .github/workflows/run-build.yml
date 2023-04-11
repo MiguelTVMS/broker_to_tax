@@ -12,10 +12,10 @@ on:
 
 jobs:
   call-test:
-    name: Run
+    name: Call Tests
     uses: ./.github/workflows/test.yml
 
   call-compile:
-    name: Run
+    name: Call Compile
     needs: call-test
     uses: ./.github/workflows/compile.yml

@@ -15,7 +15,7 @@
 		},
 		{
 			"label": "dart compile",
-			"detail": "Build the project",
+			"detail": "Compile the project",
 			"type": "shell",
 			"command": "dart",
 			"group": {
@@ -37,6 +37,38 @@
 				"bin/main.dart",
 				"-o",
 				"bin/brokertotax"
+			],
+			"problemMatcher": [
+				"$dart-build_runner"
+			]
+		},
+		{
+			"label": "Github Actions - Compile",
+			"detail": "Build the project",
+			"type": "shell",
+			"command": "act",
+			"group": {
+				"kind": "build"
+			},
+			"args": [
+				"workflow_dispatch",
+				"-W",
+				".github${pathSeparator}workflows${pathSeparator}run-build.yml",
+				"--artifact-server-path",
+				"build"
+			],
+			"problemMatcher": []
+		},
+		{
+			"label": "Github Actions - Test",
+			"detail": "Build the project",
+			"type": "shell",
+			"command": "act",
+			"group": "test",
+			"args": [
+				"workflow_dispatch",
+				"-W",
+				".github${pathSeparator}workflows${pathSeparator}run-test.yml"
 			],
 			"problemMatcher": []
 		}

@@ -11,9 +11,11 @@ on:
     branches: [release/*]
 
 jobs:
-  test:
+  call-test:
+    name: Run
     uses: ./.github/workflows/test.yml
 
-  compile:
-    needs: test
+  call-compile:
+    name: Run
+    needs: call-test
     uses: ./.github/workflows/compile.yml

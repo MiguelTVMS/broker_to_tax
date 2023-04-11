@@ -1,4 +1,3 @@
-
 enum TransactionType {
   stock("Stock"),
   cfd("CFD"),

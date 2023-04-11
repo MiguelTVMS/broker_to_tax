@@ -7,7 +7,9 @@ import "package:logging/logging.dart";
 final _log = Logger("Main");
 
 void setLogger(String? value) {
-  if (value == null) throw UsageException("Please specify a log level.", "log-level");
+  if (value == null) {
+    throw UsageException("Please specify a log level.", "log-level");
+  }
   switch (value.toUpperCase()) {
     case "FINEST":
       Logger.root.level = Level.FINEST;
@@ -28,6 +30,7 @@ void setLogger(String? value) {
 
 void logListener(LogRecord record) {
   if (record.level == Level.INFO && Logger.root.level == Level.INFO) {
+    // ignore: avoid_print
     print(record.message);
     return;
   }

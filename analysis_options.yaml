@@ -19,6 +19,8 @@ linter:
   rules:
     - camel_case_types
     - prefer_double_quotes
+    - curly_braces_in_flow_control_structures
+    - avoid_print
 # analyzer:
 #   exclude:
 #     - path/to/excluded/files/**

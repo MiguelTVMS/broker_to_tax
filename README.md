@@ -1,6 +1,6 @@
 # Broker to Tax
 
-[![Test](https://github.com/MiguelTVMS/broker_to_tax/actions/workflows/test.yaml/badge.svg?event=push)](https://github.com/MiguelTVMS/broker_to_tax/actions/workflows/test.yaml)
+[![Main](https://github.com/MiguelTVMS/broker_to_tax/actions/workflows/Main.yaml/badge.svg?branch=main)](https://github.com/MiguelTVMS/broker_to_tax/actions/workflows/Main.yaml)
 
 A simple cli application that transforms information from brokers to the Portuguese tax information.
 

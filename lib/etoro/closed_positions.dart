@@ -8,7 +8,7 @@ import "closed_position.dart";
 
 class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements BrokerOperations {
   List<EtoroClosedPosition> _positions = [];
-  static final _log = Logger("BaseCommand");
+  static final _log = Logger("EtoroClosedPositions");
 
   @override
   get length => _positions.length;
@@ -34,8 +34,14 @@ class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements Brok
 
     // TODO: Create a mapping between the csv columns and the EtoroClosedPosition fields
     _positions = csvPositions.skip(skipFirstRow ? 1 : 0).map(EtoroClosedPosition.fromCsvRow).toList();
+    _log.info("Found $length eToro Positions");
   }
 
   @override
-  Iterable<Gain> toGains() => _positions.map((e) => e.toGain());
+  Iterable<Gain> toGains() {
+    _log.fine("Converting to gains");
+    var gains = _positions.map((e) => e.toGain());
+    _log.finer("Converted ${gains.length} gains from $length eToro operations");
+    return gains;
+  }
 }

@@ -1,7 +1,7 @@
 import "dart:core";
 
-import "package:broker_to_tax/entities/exchange.dart";
-import "package:broker_to_tax/entities/transaction_type.dart";
+import "exchange.dart";
+import "transaction_type.dart";
 import "package:country_code/country_code.dart";
 import "package:csv/csv.dart";
 import "package:logging/logging.dart";

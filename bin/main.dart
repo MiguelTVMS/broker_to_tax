@@ -1,7 +1,7 @@
 import "dart:io";
 
 import "package:args/command_runner.dart";
-import "package:broker_to_tax/commands/etoro_command.dart";
+import "package:broker_to_tax/commands/etoro/etoro_command.dart";
 import "package:logging/logging.dart";
 
 final _log = Logger("Main");
@@ -72,7 +72,7 @@ void main(List<String> arguments) async {
         _log.shout("An unexpected error occurred.", error);
         exit(1);
       }
-      print(error);
+      _log.info(error);
       exit(64); // Exit code 64 indicates a usage error.
     });
 }

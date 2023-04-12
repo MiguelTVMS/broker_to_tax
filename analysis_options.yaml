@@ -21,6 +21,7 @@ linter:
     - prefer_double_quotes
     - curly_braces_in_flow_control_structures
     - avoid_print
+    - prefer_relative_imports
 # analyzer:
 #   exclude:
 #     - path/to/excluded/files/**

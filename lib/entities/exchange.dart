@@ -5,24 +5,7 @@ import "dart:io";
 import "package:logging/logging.dart";
 
 import "../parsers.dart";
-
-enum Currency {
-  usd("USD"),
-  eur("EUR");
-
-  const Currency(this.name);
-
-  final String name;
-
-  static Currency fromString(String name) {
-    return Currency.values.firstWhere((e) => e.name == name);
-  }
-
-  @override
-  String toString() {
-    return name;
-  }
-}
+import "currency.dart";
 
 /// Historical exchange rates.
 ///

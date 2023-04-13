@@ -1,5 +1,6 @@
 import "dart:core";
 
+import "currency.dart";
 import "exchange.dart";
 import "transaction_type.dart";
 import "package:country_code/country_code.dart";
@@ -149,24 +150,24 @@ extension GainsExtension on Iterable<Gain> {
         gain.name,
         gain.openDate,
         gain.closeDate,
-        gain.units.toStringAsFixed(2),
-        gain.openRate.toStringAsFixed(2),
-        gain.closeRate.toStringAsFixed(2),
-        gain.feesAndDividends.toStringAsFixed(2),
+        gain.units.toGainString(),
+        gain.openRate.toGainString(),
+        gain.closeRate.toGainString(),
+        gain.feesAndDividends.toGainString(),
         gain.type,
         gain.sourceCountry.alpha2,
         gain.counterpartyCountry.alpha2,
-        gain.openValue.toStringAsFixed(2),
-        gain.closeValue.toStringAsFixed(2),
-        gain.grossProfit.toStringAsFixed(2),
-        gain.netProfit.toStringAsFixed(2),
+        gain.openValue.toGainString(),
+        gain.closeValue.toGainString(),
+        gain.grossProfit.toGainString(),
+        gain.netProfit.toGainString(),
         gain.openExchangeRate[currency],
         gain.closeExchangeRate[currency],
-        gain.getOpenValueIn(currency).toStringAsFixed(2),
-        gain.getCloseValueIn(currency).toStringAsFixed(2),
-        gain.getFeesAndDividendsIn(currency).toStringAsFixed(2),
-        gain.getGrossProfitIn(currency).toStringAsFixed(2),
-        gain.getNetProfitIn(currency).toStringAsFixed(2)
+        gain.getOpenValueIn(currency).toGainString(),
+        gain.getCloseValueIn(currency).toGainString(),
+        gain.getFeesAndDividendsIn(currency).toGainString(),
+        gain.getGrossProfitIn(currency).toGainString(),
+        gain.getNetProfitIn(currency).toGainString()
       ];
 
       csvRows.add(csvColumns);
@@ -177,6 +178,8 @@ extension GainsExtension on Iterable<Gain> {
 }
 
 extension MapGainsExtension<K> on Map<K, List<Gain>> {
+  static final _log = Logger("MapGainsExtension");
+
   double get totalOpenValue => values.fold(0, (double sum, List<Gain> gains) => sum + gains.totalOpenValue);
   double get totalCloseValue => values.fold(0, (double sum, List<Gain> gains) => sum + gains.totalCloseValue);
   double get grossProfit => values.fold(0, (double sum, List<Gain> gains) => sum + gains.grossProfit);
@@ -197,4 +200,55 @@ extension MapGainsExtension<K> on Map<K, List<Gain>> {
       values.fold(0, (double sum, List<Gain> gains) => sum + gains.getAverageCloseExchangeRate(symbol));
   double getAverageOpenExchangeRate(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + gains.getAverageOpenExchangeRate(symbol));
+
+  String toCsvString(Currency currency, [bool addHeader = true]) {
+    _log.fine("Generating CSV for $length gains in $currency grouped by $K");
+
+    List<List<dynamic>> csvRows = <List<dynamic>>[];
+    List<String> headerColumns = <String>[
+      (keys.first is CountryCode) ? "Country" : K.toString(),
+      "Total Open Value",
+      "Total Close Value",
+      "Gross Profit",
+      "Net Profit",
+      "Total Fees and Dividends",
+      "Average Open Exchange Rate $currency",
+      "Average Close Exchange Rate $currency",
+      "Total Open Value in $currency",
+      "Total Close Value in $currency",
+      "Gross Profit in $currency",
+      "Net Profit in $currency",
+      "Total Fees and Dividends in $currency"
+    ];
+
+    if (addHeader) {
+      _log.fine("Adding header");
+      csvRows.add(headerColumns);
+    }
+
+    forEach((key, value) {
+      List<dynamic> csvColumns = <dynamic>[
+        (key is CountryCode) ? key.alpha2 : key.toString(),
+        value.totalOpenValue.toGainString(),
+        value.totalCloseValue.toGainString(),
+        value.grossProfit.toGainString(),
+        value.netProfit.toGainString(),
+        value.totalFeesAndDividends.toGainString(),
+        value.getAverageOpenExchangeRate(currency).toGainString(),
+        value.getAverageCloseExchangeRate(currency).toGainString(),
+        value.getTotalOpenValueIn(currency).toGainString(),
+        value.getTotalCloseValueIn(currency).toGainString(),
+        value.getGrossProfitIn(currency).toGainString(),
+        value.getNetProfitIn(currency).toGainString(),
+        value.getTotalFeesAndDividendsIn(currency).toGainString()
+      ];
+      csvRows.add(csvColumns);
+    });
+
+    return ListToCsvConverter().convert(csvRows);
+  }
+}
+
+extension DoubleExtension on double {
+  String toGainString() => toStringAsFixed(2);
 }

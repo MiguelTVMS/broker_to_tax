@@ -2,7 +2,7 @@ import "dart:io";
 
 import "package:logging/logging.dart";
 
-import "../../entities/exchange.dart";
+import "../../entities/currency.dart";
 import "../../entities/gains.dart";
 import "../../entities/transaction_type.dart";
 import "../../etoro/closed_positions.dart";
@@ -16,6 +16,13 @@ class EtoroCommand extends BaseCommand {
 
   @override
   String get name => "etoro";
+
+  @override
+  List<String> get aliases => [
+        "eToro",
+        "Etoro",
+        "ETORO",
+      ];
 
   EtoroCommand() : super(_log);
 

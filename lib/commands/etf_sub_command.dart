@@ -1,11 +1,11 @@
 import "package:logging/logging.dart";
 
-import "../entities/exchange.dart";
+import "../entities/group_by.dart";
 import "../entities/transaction_type.dart";
 import "base_command.dart";
-import "base_sub_command.dart";
+import "base_group_by_sub_command.dart";
 
-class ETFSubCommand extends BaseSubCommand {
+class ETFSubCommand extends BaseGroupBySubCommand {
   static final _log = Logger("ETFsSubCommand");
 
   @override
@@ -14,13 +14,23 @@ class ETFSubCommand extends BaseSubCommand {
   @override
   String get name => "etf";
 
-  ETFSubCommand(BaseCommand baseCommand) : super(baseCommand, _log) {
-    _log.finer("Running constructor.");
-  }
+  @override
+  List<String> get aliases => ["Etf", "ETF", "ETFs", "etfs", "ETFS"];
+
+  @override
+  TransactionType get transactionType => TransactionType.etf;
+
+  ETFSubCommand(BaseCommand baseCommand) : super(baseCommand, _log);
 
   @override
   Future<void> run() async {
     _log.info("Running command.");
-    generateData(await baseCommand.getGains(), TransactionType.etf, Currency.eur);
+    if (groupBy == GroupBy.none) {
+      generateData(await baseCommand.getGains());
+    } else if (groupBy == GroupBy.sourceCountry) {
+      generateGroupedData(await baseCommand.getGains());
+    } else {
+      throw Exception("Grouping is not yet supported for stocks.");
+    }
   }
 }

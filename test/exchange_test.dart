@@ -1,3 +1,4 @@
+import "package:broker_to_tax/entities/currency.dart";
 import "package:broker_to_tax/entities/exchange.dart";
 import "package:test/test.dart";
 

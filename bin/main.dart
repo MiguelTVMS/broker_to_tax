@@ -55,7 +55,12 @@ void logListener(LogRecord record) {
   }
 }
 
-void main(List<String> arguments) async {
+Future<void> main(List<String> arguments) async {
+  exit(await run(arguments));
+}
+
+Future<int> run(List<String> arguments) async {
+  var exitCode = 0;
   Logger.root.onRecord.listen(logListener);
   Logger.root.level = Platform.environment["LOG_LEVEL"] == "FINEST" ? Level.FINEST : Level.INFO;
   // ignore: unused_local_variable
@@ -66,13 +71,16 @@ void main(List<String> arguments) async {
         defaultsTo: "info",
         allowed: ["info", "fine", "finer", "finest"],
         callback: (setLogger))
-    ..addCommand(EtoroCommand())
-    ..run(arguments).catchError((error) {
-      if (error is! UsageException) {
-        _log.shout("An unexpected error occurred.", error);
-        exit(1);
-      }
-      _log.info(error);
-      exit(64); // Exit code 64 indicates a usage error.
-    });
+    ..addCommand(EtoroCommand());
+
+  await runner.run(arguments).catchError((error) {
+    if (error is! UsageException) {
+      _log.shout("An unexpected error occurred.", error);
+      exitCode = 1;
+    }
+    _log.info(error);
+    exitCode = 64; // Exit code 64 indicates a usage error.
+  });
+
+  return exitCode;
 }

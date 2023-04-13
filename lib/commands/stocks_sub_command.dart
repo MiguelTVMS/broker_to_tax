@@ -3,9 +3,9 @@ import "package:logging/logging.dart";
 import "../entities/group_by.dart";
 import "../entities/transaction_type.dart";
 import "base_command.dart";
-import "base_group_by_sub_command.dart";
+import "base_sub_command.dart";
 
-class StockSubCommand extends BaseGroupBySubCommand {
+class StockSubCommand extends BaseSubCommand {
   static final _log = Logger("StocksSubCommand");
 
   @override
@@ -20,17 +20,5 @@ class StockSubCommand extends BaseGroupBySubCommand {
   @override
   TransactionType get transactionType => TransactionType.stock;
 
-  StockSubCommand(BaseCommand baseCommand) : super(baseCommand, _log);
-
-  @override
-  Future<void> run() async {
-    _log.info("Running command.");
-    if (groupBy == GroupBy.none) {
-      generateData(await baseCommand.getGains());
-    } else if (groupBy == GroupBy.sourceCountry) {
-      generateGroupedData(await baseCommand.getGains());
-    } else {
-      throw Exception("Grouping is not yet supported for stocks.");
-    }
-  }
+  StockSubCommand(BaseCommand baseCommand) : super(baseCommand, _log, [GroupBy.sourceCountry, GroupBy.operation]);
 }

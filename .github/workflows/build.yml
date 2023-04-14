@@ -11,6 +11,7 @@ on:
     branches:
       - "release/*"
       - "hotfix/*"
+      - "main"
     tags:
       - "v**"
 

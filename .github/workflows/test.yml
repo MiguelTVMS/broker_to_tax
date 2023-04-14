@@ -11,6 +11,7 @@ on:
     branches-ignore:
       - "release/*"
       - "hotfix/*"
+      - "main"
     tags-ignore:
       - "**"
 

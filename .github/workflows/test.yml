@@ -12,6 +12,15 @@ on:
       - "release/*"
       - "hotfix/*"
       - "main"
+    paths:
+      - "bin/**"
+      - "lib/**"
+      - "test/**"
+      - "data/**"
+      - ".github/workflows/**"
+      - "pubspec.yaml"
+      - "analysis_options.yaml"
+      - "dart_test.yaml"
     tags-ignore:
       - "**"
 

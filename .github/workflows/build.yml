@@ -12,10 +12,10 @@ on:
 
 jobs:
   unit-test:
-    name: Unit
+    name: Run
     uses: ./.github/workflows/unit-test.yml
 
   compile:
-    name: Compile
+    name: Run
     needs: unit-test
     uses: ./.github/workflows/compile.yml

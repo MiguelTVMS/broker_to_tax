@@ -14,5 +14,5 @@ on:
 
 jobs:
   unit-test:
-    name: Unit Test
+    name: Run
     uses: ./.github/workflows/unit-test.yml

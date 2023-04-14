@@ -8,3 +8,4 @@
   - Transactions grouped by country for stocks and ETFs.
   - Transactions grouped by crypto currency.
   - Transactions grouped by CFD.
+  - Added testing for the full commands.

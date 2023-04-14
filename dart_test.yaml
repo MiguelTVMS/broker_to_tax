@@ -1,0 +1,6 @@
+concurrency: 1
+reporter: expanded
+
+tags:
+  command:
+    timeout: 2x

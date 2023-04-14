@@ -9,7 +9,7 @@ void main() {
 
   group("Command:", () {
     group("stock", ([String operation = "stock"]) {
-      test("Ungrouped", () async {
+      test("", () async {
         var arguments = [
           "etoro",
           operation,
@@ -20,7 +20,7 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
       test("-g source-country", () async {
         var arguments = [
           "etoro",
@@ -34,7 +34,7 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
       test("-g operation", () async {
         var arguments = [
           "etoro",
@@ -48,10 +48,10 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
     });
     group("etf", ([String operation = "etf"]) {
-      test("Ungrouped", () async {
+      test("", () async {
         var arguments = [
           "etoro",
           operation,
@@ -62,7 +62,7 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
       test("-g source-country", () async {
         var arguments = [
           "etoro",
@@ -76,7 +76,7 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
       test("-g operation", () async {
         var arguments = [
           "etoro",
@@ -90,10 +90,10 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
     });
     group("crypto", ([String operation = "crypto"]) {
-      test("Ungrouped", () async {
+      test("", () async {
         var arguments = [
           "etoro",
           operation,
@@ -104,7 +104,7 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
       test("-g operation", () async {
         var arguments = [
           "etoro",
@@ -118,10 +118,10 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
     });
     group("cfd", ([String operation = "cfd"]) {
-      test("Ungrouped", () async {
+      test("", () async {
         var arguments = [
           "etoro",
           operation,
@@ -132,7 +132,7 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
       test("-g operation", () async {
         var arguments = [
           "etoro",
@@ -146,7 +146,7 @@ void main() {
         ];
         var exitCode = await app.run(arguments);
         expect(exitCode, equals(0));
-      });
+      }, tags: ["command"]);
     });
   });
 }

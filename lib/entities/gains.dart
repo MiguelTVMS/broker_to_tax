@@ -117,7 +117,7 @@ extension GainsExtension on Iterable<Gain> {
 
     List<List<dynamic>> csvRows = <List<dynamic>>[];
     List<String> headerColumns = <String>[
-      "name",
+      "Name",
       "Open Date",
       "Close Date",
       "Units",

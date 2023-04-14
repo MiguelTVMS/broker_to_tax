@@ -1,76 +1,76 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "dart",
-			"command": "dart",
-			"cwd": "",
-			"args": [
-				"doc",
-				"."
-			],
-			"problemMatcher": [],
-			"label": "Generate Documentation",
-			"detail": ""
-		},
-		{
-			"label": "dart compile",
-			"detail": "Compile the project",
-			"type": "shell",
-			"command": "dart",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"windows": {
-				"args": [
-					"compile",
-					"exe",
-					"bin\\main.dart",
-					"-o",
-					"build\\brokertotax.exe"
-				],
-			},
-			"args": [
-				"compile",
-				"exe",
-				"bin/main.dart",
-				"-o",
-				"bin/brokertotax"
-			],
-			"problemMatcher": [
-				"$dart-build_runner"
-			]
-		},
-		{
-			"label": "Github Actions - Compile",
-			"detail": "Build the project",
-			"type": "shell",
-			"command": "act",
-			"group": {
-				"kind": "build"
-			},
-			"args": [
-				"workflow_dispatch",
-				"-W",
-				".github${pathSeparator}workflows${pathSeparator}run-build.yml",
-				"--artifact-server-path",
-				"build"
-			],
-			"problemMatcher": []
-		},
-		{
-			"label": "Github Actions - Test",
-			"detail": "Build the project",
-			"type": "shell",
-			"command": "act",
-			"group": "test",
-			"args": [
-				"workflow_dispatch",
-				"-W",
-				".github${pathSeparator}workflows${pathSeparator}run-test.yml"
-			],
-			"problemMatcher": []
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "dart",
+            "command": "dart",
+            "cwd": "",
+            "args": [
+                "doc",
+                "."
+            ],
+            "problemMatcher": [],
+            "label": "Generate Documentation",
+            "detail": ""
+        },
+        {
+            "label": "dart compile",
+            "detail": "Compile the project",
+            "type": "shell",
+            "command": "dart",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "windows": {
+                "args": [
+                    "compile",
+                    "exe",
+                    "bin\\main.dart",
+                    "-o",
+                    "build\\brokertotax.exe"
+                ],
+            },
+            "args": [
+                "compile",
+                "exe",
+                "bin/main.dart",
+                "-o",
+                "bin/brokertotax"
+            ],
+            "problemMatcher": [
+                "$dart-build_runner"
+            ]
+        },
+        {
+            "label": "Github Actions - Build",
+            "detail": "Build the project",
+            "type": "shell",
+            "command": "act",
+            "group": {
+                "kind": "build"
+            },
+            "args": [
+                "workflow_dispatch",
+                "-W",
+                ".github${pathSeparator}workflows${pathSeparator}build.yml",
+                "--artifact-server-path",
+                "build"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Github Actions - Test",
+            "detail": "Build the project",
+            "type": "shell",
+            "command": "act",
+            "group": "test",
+            "args": [
+                "workflow_dispatch",
+                "-W",
+                ".github${pathSeparator}workflows${pathSeparator}test.yml"
+            ],
+            "problemMatcher": []
+        }
+    ]
 }

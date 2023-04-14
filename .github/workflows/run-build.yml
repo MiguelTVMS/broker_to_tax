@@ -13,9 +13,9 @@ on:
 jobs:
   call-test:
     name: Call Tests
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/reusable/test.yml
 
   call-compile:
     name: Call Compile
     needs: call-test
-    uses: ./.github/workflows/compile.yml
+    uses: ./.github/workflows/reusable/compile.yml

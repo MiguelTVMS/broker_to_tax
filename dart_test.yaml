@@ -1,6 +1,14 @@
 concurrency: 1
 reporter: expanded
 
+presets:
+  github:
+    reporter: github
+    add_presets:
+      - "ci"
+
+  ci:
+    exclude_tags: command
+
 tags:
   command:
-    timeout: 2x

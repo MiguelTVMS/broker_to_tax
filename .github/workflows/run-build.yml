@@ -1,0 +1,21 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [release/*]
+
+jobs:
+  call-test:
+    name: Call Tests
+    uses: ./.github/workflows/test.yml
+
+  call-compile:
+    name: Call Compile
+    needs: call-test
+    uses: ./.github/workflows/compile.yml

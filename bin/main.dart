@@ -1,13 +1,15 @@
 import "dart:io";
 
 import "package:args/command_runner.dart";
-import "package:broker_to_tax/commands/etoro_command.dart";
+import "package:broker_to_tax/commands/etoro/etoro_command.dart";
 import "package:logging/logging.dart";
 
 final _log = Logger("Main");
 
 void setLogger(String? value) {
-  if (value == null) throw UsageException("Please specify a log level.", "log-level");
+  if (value == null) {
+    throw UsageException("Please specify a log level.", "log-level");
+  }
   switch (value.toUpperCase()) {
     case "FINEST":
       Logger.root.level = Level.FINEST;
@@ -28,6 +30,7 @@ void setLogger(String? value) {
 
 void logListener(LogRecord record) {
   if (record.level == Level.INFO && Logger.root.level == Level.INFO) {
+    // ignore: avoid_print
     print(record.message);
     return;
   }
@@ -52,7 +55,12 @@ void logListener(LogRecord record) {
   }
 }
 
-void main(List<String> arguments) async {
+Future<void> main(List<String> arguments) async {
+  exit(await run(arguments));
+}
+
+Future<int> run(List<String> arguments) async {
+  var exitCode = 0;
   Logger.root.onRecord.listen(logListener);
   Logger.root.level = Platform.environment["LOG_LEVEL"] == "FINEST" ? Level.FINEST : Level.INFO;
   // ignore: unused_local_variable
@@ -63,13 +71,16 @@ void main(List<String> arguments) async {
         defaultsTo: "info",
         allowed: ["info", "fine", "finer", "finest"],
         callback: (setLogger))
-    ..addCommand(EtoroCommand())
-    ..run(arguments).catchError((error) {
-      if (error is! UsageException) {
-        _log.shout("An unexpected error occurred.", error);
-        exit(1);
-      }
-      print(error);
-      exit(64); // Exit code 64 indicates a usage error.
-    });
+    ..addCommand(EtoroCommand());
+
+  await runner.run(arguments).catchError((error) {
+    if (error is! UsageException) {
+      _log.shout("An unexpected error occurred.", error);
+      exitCode = 1;
+    }
+    _log.info(error);
+    exitCode = 64; // Exit code 64 indicates a usage error.
+  });
+
+  return exitCode;
 }

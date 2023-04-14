@@ -45,3 +45,6 @@ bin/brokertotax.exe
 
 #Ignore output files
 *.csv
+
+#Ignore coverage files
+coverage/**/*

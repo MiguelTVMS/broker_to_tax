@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run eToro",
+            "name": "Run eToro Stock",
             "type": "dart",
             "request": "launch",
             "program": "bin/main.dart",
@@ -14,10 +14,32 @@
             },
             "args": [
                 "etoro",
+                "stock",
                 "--file",
                 "${workspaceFolder}${pathSeparator}.sample_data${pathSeparator}etoro.csv",
                 "--exchange-directory",
                 "${workspaceFolder}${pathSeparator}data${pathSeparator}exchange",
+                "-l",
+                "finest"
+            ]
+        },
+        {
+            "name": "Run eToro Stock Group By Source Country",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/main.dart",
+            "env": {
+                "LOG_LEVEL": "FINEST"
+            },
+            "args": [
+                "etoro",
+                "stock",
+                "--file",
+                "${workspaceFolder}${pathSeparator}.sample_data${pathSeparator}etoro.csv",
+                "--exchange-directory",
+                "${workspaceFolder}${pathSeparator}data${pathSeparator}exchange",
+                "-g",
+                "source-country",
                 "-l",
                 "finest"
             ]
@@ -39,6 +61,50 @@
             "args": [
                 "help",
                 "etoro"
+            ]
+        },
+        {
+            "name": "Run eToro Stock Help",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/main.dart",
+            "args": [
+                "help",
+                "etoro",
+                "stock"
+            ]
+        },
+        {
+            "name": "Run eToro Crypto Help",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/main.dart",
+            "args": [
+                "help",
+                "etoro",
+                "crypto"
+            ]
+        },
+        {
+            "name": "Run eToro ETF Help",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/main.dart",
+            "args": [
+                "help",
+                "etoro",
+                "etf"
+            ]
+        },
+        {
+            "name": "Run eToro CFD Help",
+            "type": "dart",
+            "request": "launch",
+            "program": "bin/main.dart",
+            "args": [
+                "help",
+                "etoro",
+                "cfd"
             ]
         },
         {

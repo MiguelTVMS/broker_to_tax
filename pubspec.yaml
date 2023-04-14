@@ -1,6 +1,6 @@
 name: broker_to_tax
 description: A simple cli application that transforms information from brokers to the Portuguese tax information.
-version: 0.9.0
+version: 0.10.0
 repository: https://github.com/MiguelTVMS/broker_to_tax
 issue_tracker: https://github.com/MiguelTVMS/broker_to_tax/issues
 

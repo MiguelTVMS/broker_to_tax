@@ -5,24 +5,7 @@ import "dart:io";
 import "package:logging/logging.dart";
 
 import "../parsers.dart";
-
-enum Currency {
-  usd("USD"),
-  eur("EUR");
-
-  const Currency(this.name);
-
-  final String name;
-
-  static Currency fromString(String name) {
-    return Currency.values.firstWhere((e) => e.name == name);
-  }
-
-  @override
-  String toString() {
-    return name;
-  }
-}
+import "currency.dart";
 
 /// Historical exchange rates.
 ///
@@ -34,15 +17,21 @@ class HistoricalExchangeRates extends DailyExchangeRates {
   static HistoricalExchangeRates? _instance;
   HistoricalExchangeRates._();
   factory HistoricalExchangeRates() => _instance ??= HistoricalExchangeRates._();
+  bool _initialized = false;
 
   /// Adds exchange rates from a list of JSON files.
   ///
   /// The files in [exchangeFiles] must contain a JSON object with the date as key and the exchange rates as value.
   Future<void> addFromJsonFilesInDirectory(Iterable<FileSystemEntity> exchangeFiles) async {
-    _log.fine("Adding exchange rates from ${exchangeFiles.length} files.");
-    for (var file in exchangeFiles) {
-      _log.finer("Adding exchange rates from file $file.");
-      HistoricalExchangeRates().addFromJsonString(await (file as File).readAsString());
+    if (!_initialized) {
+      _log.fine("Adding exchange rates from ${exchangeFiles.length} files.");
+      for (var file in exchangeFiles) {
+        _log.finer("Adding exchange rates from file $file.");
+        HistoricalExchangeRates().addFromJsonString(await (file as File).readAsString());
+        _initialized = true;
+      }
+    } else {
+      _log.fine("Exchange rates already initialized.");
     }
   }
 }

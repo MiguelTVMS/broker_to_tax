@@ -15,4 +15,4 @@ on:
 jobs:
   call-test:
     name: Run
-    uses: ./.github/workflows/test.yml
+    uses: ./.github/workflows/reusable/test.yml

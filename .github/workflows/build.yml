@@ -11,11 +11,11 @@ on:
     branches: [release/*]
 
 jobs:
-  call-test:
-    name: Tests
-    uses: ./.github/workflows/reusable/test.yml
+  unit-test:
+    name: Unit
+    uses: ./.github/workflows/unit-test.yml
 
-  call-compile:
+  compile:
     name: Compile
-    needs: call-test
-    uses: ./.github/workflows/reusable/compile.yml
+    needs: unit-test
+    uses: ./.github/workflows/compile.yml

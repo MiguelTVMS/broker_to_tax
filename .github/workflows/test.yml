@@ -8,7 +8,7 @@ name: Test
 on:
   workflow_dispatch:
   push:
-    branches: [feature/*, hotfix/*]
+    branches: [feature/*, bugfix/*]
   pull_request:
     branches: [main, develop]
 

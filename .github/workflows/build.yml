@@ -12,6 +12,13 @@ on:
       - "release/*"
       - "hotfix/*"
       - "main"
+    paths:
+      - "bin/**"
+      - "lib/**"
+      - "data/**"
+      - ".github/workflows/**"
+      - "pubspec.yaml"
+
     tags:
       - "v**"
 

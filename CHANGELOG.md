@@ -1,3 +1,3 @@
-# Version 1.0.1
+# Version 1.1.0
 
-Fixed the name of the operation header on the ungrouped CSV output file.
+Fees and dividends are now separated.

@@ -85,7 +85,9 @@ class EtoroClosedPosition implements BrokerOperation {
       units: units,
       openRate: openRate,
       closeRate: closeRate,
-      feesAndDividends: rolloverFeesAndDividends,
+      //TODO: Try to get the correct data from other parts of the eToro xlsx file.
+      fees: (rolloverFeesAndDividends < 0) ? rolloverFeesAndDividends : 0,
+      dividends: (rolloverFeesAndDividends > 0) ? rolloverFeesAndDividends : 0,
       type: transactionType,
       sourceCountry: CountryCode.parse(country ?? "US"),
       counterpartyCountry: CountryCode.US,

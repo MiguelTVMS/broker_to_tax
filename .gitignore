@@ -48,3 +48,7 @@ bin/brokertotax.exe
 
 #Ignore coverage files
 coverage/**/*
+
+#Sample data control. Only add specific files to avoid privacy issues.
+.sample_data/*
+!.sample_data/etoro.csv #Include etoro.csv

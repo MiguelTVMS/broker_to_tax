@@ -19,6 +19,13 @@ void main() {
     csvString +=
         "\r\n1308606081,Buy Energy Select Sector SPDR, 3.16 ,0.064914,13/09/2021 13:31:14,07/03/2022 14:31:07,1, 0.00 , 1.78 , 48.68 , 76.03 , 0.00 , 0.00 , 0.06 ,Karlo_s,ETF,US81369Y5069,";
 
+    var excelFilePath = ".sample_data/etoro-2023.xlsx";
+
+    test("Read closed positions from Excel.", () {
+      var positions = EtoroClosedPositions.fromExcelFile(excelFilePath);
+
+      expect(positions.length, 3823);
+    });
     test("Create closed positions from CSV.", () {
       var positions = EtoroClosedPositions.fromCsv(csvString);
 

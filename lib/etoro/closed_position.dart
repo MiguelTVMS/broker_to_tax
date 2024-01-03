@@ -1,4 +1,5 @@
 import "package:country_code/country_code.dart";
+import "package:excel/excel.dart";
 
 import "../entities/broker_operation.dart";
 import "../entities/gains.dart";
@@ -74,6 +75,28 @@ class EtoroClosedPosition implements BrokerOperation {
         type: csvRow[15],
         isin: csvRow[16],
         notes: csvRow[17]);
+  }
+
+  factory EtoroClosedPosition.fromExcelRow(List<Data?> excelRow) {
+    return EtoroClosedPosition(
+        positionId: ExcelParsers.toInteger(excelRow[0]),
+        action: excelRow[1]!.value.toString(),
+        amount: ExcelParsers.toDouble(excelRow[2]),
+        units: ExcelParsers.toDouble(excelRow[3]),
+        openDate: ExcelParsers.toDateTime(excelRow[4], "dd/MM/yyyy HH:mm:ss"),
+        closeDate: ExcelParsers.toDateTime(excelRow[5], "dd/MM/yyyy HH:mm:ss"),
+        leverage: ExcelParsers.toInteger(excelRow[6]),
+        spread: ExcelParsers.toDouble(excelRow[7]),
+        profit: ExcelParsers.toDouble(excelRow[8]),
+        openRate: ExcelParsers.toDouble(excelRow[9]),
+        closeRate: ExcelParsers.toDouble(excelRow[10]),
+        takeProfitRate: ExcelParsers.toDouble(excelRow[11]),
+        stopLossRate: ExcelParsers.toDouble(excelRow[12]),
+        rolloverFeesAndDividends: ExcelParsers.toDouble(excelRow[13]),
+        copiedFrom: excelRow[14]!.value.toString(),
+        type: excelRow[15]!.value.toString(),
+        isin: excelRow[16]!.value.toString(),
+        notes: excelRow[17]?.value.toString());
   }
 
   @override

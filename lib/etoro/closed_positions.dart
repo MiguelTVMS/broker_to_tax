@@ -1,5 +1,7 @@
 import "dart:collection";
+import "dart:io";
 import "package:csv/csv.dart";
+import "package:excel/excel.dart";
 import "package:logging/logging.dart";
 
 import "../entities/broker_operation.dart";
@@ -26,6 +28,27 @@ class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements Brok
   @override
   void operator []=(int index, EtoroClosedPosition value) {
     _positions[index] = value;
+  }
+
+  static fromExcelFile(String excelFilePath) {
+    var xlsxFile = File(excelFilePath);
+    if (!xlsxFile.existsSync()) throw Exception("File not found: $excelFilePath");
+
+    _log.info("Reading file: $excelFilePath");
+    var excel = Excel.decodeBytes(File(excelFilePath).readAsBytesSync());
+
+    Sheet? sheet = excel.tables["Closed Positions"];
+    if (sheet == null) throw Exception("Closed Positions sheet not found");
+
+    return EtoroClosedPositions.fromExcelSheet(sheet);
+  }
+
+  EtoroClosedPositions.fromExcelSheet(Sheet sheet, [bool skipFirstRow = true]) {
+    _log.fine("Parsing Excel sheet");
+    List<List<Data?>> excelRows = sheet.rows;
+
+    _positions = excelRows.skip(skipFirstRow ? 1 : 0).map(EtoroClosedPosition.fromExcelRow).toList();
+    _log.info("Found $length eToro Positions");
   }
 
   EtoroClosedPositions.fromCsv(String csvString, [bool skipFirstRow = true]) {

@@ -1,5 +1,10 @@
+import "dart:io";
+
 import "package:broker_to_tax/entities/gains.dart";
+import "package:broker_to_tax/etoro/account_activities.dart";
 import "package:broker_to_tax/etoro/closed_positions.dart";
+import "package:broker_to_tax/etoro/dividends.dart";
+import "package:excel/excel.dart";
 import "package:test/test.dart";
 
 void main() {
@@ -21,10 +26,28 @@ void main() {
 
     var excelFilePath = ".sample_data/etoro-2023.xlsx";
 
-    test("Read closed positions from Excel.", () {
+    test("Read closed positions from Excel file.", () {
       var positions = EtoroClosedPositions.fromExcelFile(excelFilePath);
 
       expect(positions.length, 3823);
+    });
+    test("Read closed positions from Excel sheet.", () {
+      var excel = Excel.decodeBytes(File(excelFilePath).readAsBytesSync());
+      var positions = EtoroClosedPositions.fromExcelTables(excel);
+
+      expect(positions.length, 3823);
+    });
+    test("Read dividends from Excel sheet.", () {
+      var excel = Excel.decodeBytes(File(excelFilePath).readAsBytesSync());
+      var dividends = EtoroDividends.fromExcelTables(excel);
+
+      expect(dividends.length, 1928);
+    });
+    test("Read account activities from Excel sheet.", () {
+      var excel = Excel.decodeBytes(File(excelFilePath).readAsBytesSync());
+      var activities = EtoroAccountActivities.fromExcelSheet(excel);
+
+      expect(activities.length, 10634);
     });
     test("Create closed positions from CSV.", () {
       var positions = EtoroClosedPositions.fromCsv(csvString);

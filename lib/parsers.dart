@@ -23,6 +23,11 @@ class ExcelParsers {
     }
   }
 
+  static int? toIntegerOrNull(Data? data) {
+    if (data == null) return null;
+    return toInteger(data);
+  }
+
   static double toDouble(Data? data) {
     if (data!.value.runtimeType == DoubleCellValue) {
       return (data.value as DoubleCellValue).value;

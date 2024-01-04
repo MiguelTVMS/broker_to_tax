@@ -111,7 +111,7 @@
             "name": "Run test",
             "type": "dart",
             "request": "launch",
-            "program": "test/all.dart"
+            "program": "test/*.dart"
         }
     ]
 }

@@ -6,6 +6,7 @@ import "package:logging/logging.dart";
 
 import "../entities/broker_operation.dart";
 import "../entities/gains.dart";
+import "account_activities.dart";
 import "closed_position.dart";
 
 class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements BrokerOperations {
@@ -37,18 +38,24 @@ class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements Brok
     _log.info("Reading file: $excelFilePath");
     var excel = Excel.decodeBytes(File(excelFilePath).readAsBytesSync());
 
-    Sheet? sheet = excel.tables["Closed Positions"];
-    if (sheet == null) throw Exception("Closed Positions sheet not found");
+    var activities = EtoroAccountActivities.fromExcelSheet(excel);
+    var positions = EtoroClosedPositions.fromExcelTables(excel);
 
-    return EtoroClosedPositions.fromExcelSheet(sheet);
+    positions.crossData(activities);
+
+    return positions;
   }
 
-  EtoroClosedPositions.fromExcelSheet(Sheet sheet, [bool skipFirstRow = true]) {
-    _log.fine("Parsing Excel sheet");
+  EtoroClosedPositions.fromExcelTables(Excel excel, [bool skipFirstRow = true]) {
+    var sheetName = "Closed Positions";
+    Sheet? sheet = excel.tables[sheetName];
+    if (sheet == null) throw Exception("$sheetName sheet not found");
+
+    _log.fine("Parsing Closed Positions Excel sheet");
     List<List<Data?>> excelRows = sheet.rows;
 
     _positions = excelRows.skip(skipFirstRow ? 1 : 0).map(EtoroClosedPosition.fromExcelRow).toList();
-    _log.info("Found $length eToro Positions");
+    _log.info("Found $length eToro Closed Positions");
   }
 
   EtoroClosedPositions.fromCsv(String csvString, [bool skipFirstRow = true]) {
@@ -58,6 +65,14 @@ class EtoroClosedPositions extends ListBase<EtoroClosedPosition> implements Brok
     // TODO: Create a mapping between the csv columns and the EtoroClosedPosition fields
     _positions = csvPositions.skip(skipFirstRow ? 1 : 0).map(EtoroClosedPosition.fromCsvRow).toList();
     _log.info("Found $length eToro Positions");
+  }
+
+  crossData(EtoroAccountActivities activities) {
+    _log.fine("Crossing data");
+    for (var position in _positions) {
+      position.crossData(activities);
+    }
+    _log.finer("Crossed data for $length eToro positions");
   }
 
   @override

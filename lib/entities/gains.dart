@@ -2,6 +2,7 @@ import "dart:core";
 
 import "currency.dart";
 import "exchange.dart";
+import "fee.dart";
 import "transaction_type.dart";
 import "package:country_code/country_code.dart";
 import "package:csv/csv.dart";
@@ -14,8 +15,7 @@ class Gain {
   double units;
   double openRate;
   double closeRate;
-  double fees;
-  double dividends;
+  Iterable<Fee>? fees;
   TransactionType type;
   CountryCode sourceCountry;
   CountryCode counterpartyCountry;
@@ -26,11 +26,8 @@ class Gain {
   double? _closeValue;
   double get closeValue => _closeValue ??= units * closeRate;
 
-  double? _grossProfit;
-  double get grossProfit => _grossProfit ??= closeValue - openValue;
-
-  double? _netProfit;
-  double get netProfit => _netProfit ??= closeValue - openValue + dividends;
+  double? _profit;
+  double get profit => _profit ??= closeValue - openValue;
 
   ExchangeRate? _openExchangeRate;
   ExchangeRate get openExchangeRate => _openExchangeRate ??= HistoricalExchangeRates()[openDate]!;
@@ -46,7 +43,6 @@ class Gain {
       required this.openRate,
       required this.closeRate,
       required this.fees,
-      required this.dividends,
       required this.type,
       required this.sourceCountry,
       required this.counterpartyCountry});
@@ -55,14 +51,17 @@ class Gain {
 
   double getCloseValueIn(Currency symbol) => closeExchangeRate.convert(closeValue, symbol);
 
-  double getFeesIn(Currency symbol) => closeExchangeRate.convert(fees, symbol);
+  double getFeesSum() => fees.getFeesSum();
 
-  double getDividendsIn(Currency symbol) => closeExchangeRate.convert(dividends, symbol);
+  double getFeesSumIn(Currency symbol) => fees.getFeesSumIn(symbol);
 
-  double getGrossProfitIn(Currency symbol) => getCloseValueIn(symbol) - getOpenValueIn(symbol);
+  double getProfitIn(Currency symbol) => getCloseValueIn(symbol) - getOpenValueIn(symbol);
 
-  double getNetProfitIn(Currency symbol) =>
-      getCloseValueIn(symbol) - getOpenValueIn(symbol) + getDividendsIn(symbol) + getFeesIn(symbol);
+  //TODO: Validate net profit calculation
+  double getNetProfit() => closeValue - openValue - getFeesSum();
+
+  //TODO: Validate net profit calculation
+  double getNetProfitIn(Currency symbol) => getCloseValueIn(symbol) - getOpenValueIn(symbol) - getFeesSumIn(symbol);
 }
 
 extension GainsExtension on Iterable<Gain> {
@@ -76,18 +75,18 @@ extension GainsExtension on Iterable<Gain> {
 
   double get totalOpenValue => fold(0, (double sum, Gain gain) => sum + gain.openValue);
   double get totalCloseValue => fold(0, (double sum, Gain gain) => sum + gain.closeValue);
-  double get grossProfit => fold(0, (double sum, Gain gain) => sum + gain.grossProfit);
-  double get netProfit => fold(0, (double sum, Gain gain) => sum + gain.netProfit);
-  double get totalFees => fold(0, (double sum, Gain gain) => sum + gain.fees);
-  double get totalDividends => fold(0, (double sum, Gain gain) => sum + gain.dividends);
+  double get totalProfit => fold(0, (double sum, Gain gain) => sum + gain.profit);
+  double get totalFees => fold(0, (double sum, Gain gain) => sum + gain.getFeesSum());
+  //TODO: Validate net profit calculation
+  double get netProfit => fold(0, (double sum, Gain gain) => sum + gain.getNetProfit());
 
   double getTotalOpenValueIn(Currency symbol) => fold(0, (double sum, Gain gain) => sum + gain.getOpenValueIn(symbol));
   double getTotalCloseValueIn(Currency symbol) =>
       fold(0, (double sum, Gain gain) => sum + gain.getCloseValueIn(symbol));
-  double getGrossProfitIn(Currency symbol) => fold(0, (double sum, Gain gain) => sum + gain.getGrossProfitIn(symbol));
+  double getProfitIn(Currency symbol) => fold(0, (double sum, Gain gain) => sum + gain.getProfitIn(symbol));
+  //TODO: Validate net profit calculation
   double getNetProfitIn(Currency symbol) => fold(0, (double sum, Gain gain) => sum + gain.getNetProfitIn(symbol));
-  double getTotalFeesIn(Currency symbol) => fold(0, (double sum, Gain gain) => sum + gain.getFeesIn(symbol));
-  double getTotalDividendsIn(Currency symbol) => fold(0, (double sum, Gain gain) => sum + gain.getDividendsIn(symbol));
+  double getTotalFeesIn(Currency symbol) => fold(0, (double sum, Gain gain) => sum + gain.getFeesSumIn(symbol));
 
   Map<K, List<Gain>> groupBy<K>(K Function(Gain) keyFunction) => fold(<K, List<Gain>>{},
       (Map<K, List<Gain>> map, Gain element) => map..putIfAbsent(keyFunction(element), () => <Gain>[]).add(element));
@@ -129,20 +128,17 @@ extension GainsExtension on Iterable<Gain> {
       "OpenRate",
       "CloseRate",
       "Fees",
-      "Dividends",
       "Type",
       "Source Country",
       "Counterparty Country",
       "Open Value",
       "Close Value",
       "Gross Profit",
-      "Net Profit",
       "Open $currency ExchangeRate",
       "Close $currency ExchangeRate",
       "Open Value in $currency",
       "Close Value in $currency",
       "Fees in $currency",
-      "Dividends in $currency",
       "Gross Profit in $currency",
       "Net Profit in $currency"
     ];
@@ -160,22 +156,19 @@ extension GainsExtension on Iterable<Gain> {
         gain.units.toGainString(),
         gain.openRate.toGainString(),
         gain.closeRate.toGainString(),
-        gain.fees.toGainString(),
-        gain.dividends.toGainString(),
+        gain.getFeesSum().toGainString(),
         gain.type,
         gain.sourceCountry.alpha2,
         gain.counterpartyCountry.alpha2,
         gain.openValue.toGainString(),
         gain.closeValue.toGainString(),
-        gain.grossProfit.toGainString(),
-        gain.netProfit.toGainString(),
+        gain.profit.toGainString(),
         gain.openExchangeRate[currency],
         gain.closeExchangeRate[currency],
         gain.getOpenValueIn(currency).toGainString(),
         gain.getCloseValueIn(currency).toGainString(),
-        gain.getFeesIn(currency).toGainString(),
-        gain.getDividendsIn(currency).toGainString(),
-        gain.getGrossProfitIn(currency).toGainString(),
+        gain.getFeesSumIn(currency).toGainString(),
+        gain.getProfitIn(currency).toGainString(),
         gain.getNetProfitIn(currency).toGainString()
       ];
 
@@ -191,22 +184,20 @@ extension MapGainsExtension<K> on Map<K, List<Gain>> {
 
   double get totalOpenValue => values.fold(0, (double sum, List<Gain> gains) => sum + gains.totalOpenValue);
   double get totalCloseValue => values.fold(0, (double sum, List<Gain> gains) => sum + gains.totalCloseValue);
-  double get grossProfit => values.fold(0, (double sum, List<Gain> gains) => sum + gains.grossProfit);
+  double get grossProfit => values.fold(0, (double sum, List<Gain> gains) => sum + gains.totalProfit);
   double get netProfit => values.fold(0, (double sum, List<Gain> gains) => sum + gains.netProfit);
   double get totalFees => values.fold(0, (double sum, List<Gain> gains) => sum + gains.totalFees);
-  double get totalDividends => values.fold(0, (double sum, List<Gain> gains) => sum + gains.totalDividends);
+
   double getTotalOpenValueIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + gains.getTotalOpenValueIn(symbol));
   double getTotalCloseValueIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + gains.getTotalCloseValueIn(symbol));
   double getGrossProfitIn(Currency symbol) =>
-      values.fold(0, (double sum, List<Gain> gains) => sum + gains.getGrossProfitIn(symbol));
+      values.fold(0, (double sum, List<Gain> gains) => sum + gains.getProfitIn(symbol));
   double getNetProfitIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + gains.getNetProfitIn(symbol));
   double getTotalFeesIn(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + gains.getTotalFeesIn(symbol));
-  double getDividendsIn(Currency symbol) =>
-      values.fold(0, (double sum, List<Gain> gains) => sum + gains.getTotalDividendsIn(symbol));
   double getAverageCloseExchangeRate(Currency symbol) =>
       values.fold(0, (double sum, List<Gain> gains) => sum + gains.getAverageCloseExchangeRate(symbol));
   double getAverageOpenExchangeRate(Currency symbol) =>
@@ -223,7 +214,6 @@ extension MapGainsExtension<K> on Map<K, List<Gain>> {
       "Gross Profit",
       "Net Profit",
       "Total Fees",
-      "Total Dividends",
       "Average Open Exchange Rate $currency",
       "Average Close Exchange Rate $currency",
       "Total Open Value in $currency",
@@ -231,7 +221,6 @@ extension MapGainsExtension<K> on Map<K, List<Gain>> {
       "Gross Profit in $currency",
       "Net Profit in $currency",
       "Total Fees in $currency",
-      "Total Dividends in $currency"
     ];
 
     if (addHeader) {
@@ -244,18 +233,16 @@ extension MapGainsExtension<K> on Map<K, List<Gain>> {
         (key is CountryCode) ? key.alpha2 : key.toString(),
         value.totalOpenValue.toGainString(),
         value.totalCloseValue.toGainString(),
-        value.grossProfit.toGainString(),
+        value.totalProfit.toGainString(),
         value.netProfit.toGainString(),
         value.totalFees.toGainString(),
-        value.totalDividends.toGainString(),
         value.getAverageOpenExchangeRate(currency).toGainString(),
         value.getAverageCloseExchangeRate(currency).toGainString(),
         value.getTotalOpenValueIn(currency).toGainString(),
         value.getTotalCloseValueIn(currency).toGainString(),
-        value.getGrossProfitIn(currency).toGainString(),
+        value.getProfitIn(currency).toGainString(),
         value.getNetProfitIn(currency).toGainString(),
-        value.getTotalFeesIn(currency).toGainString(),
-        value.getTotalDividendsIn(currency).toGainString()
+        value.getTotalFeesIn(currency).toGainString()
       ];
       csvRows.add(csvColumns);
     });

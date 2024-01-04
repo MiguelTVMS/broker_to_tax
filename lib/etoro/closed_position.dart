@@ -2,9 +2,11 @@ import "package:country_code/country_code.dart";
 import "package:excel/excel.dart";
 
 import "../entities/broker_operation.dart";
+import "../entities/fee.dart";
 import "../entities/gains.dart";
 import "../parsers.dart";
 import "../entities/transaction_type.dart";
+import "account_activities.dart";
 
 class EtoroClosedPosition implements BrokerOperation {
   int positionId;
@@ -21,6 +23,9 @@ class EtoroClosedPosition implements BrokerOperation {
   double takeProfitRate;
   double stopLossRate;
   double rolloverFeesAndDividends;
+  Map<DateTime, double>? fees;
+  double? netDividends;
+  double? netDividendTaxAmount;
   String? copiedFrom;
   String type;
   String? isin;
@@ -108,12 +113,21 @@ class EtoroClosedPosition implements BrokerOperation {
       units: units,
       openRate: openRate,
       closeRate: closeRate,
-      //TODO: Try to get the correct data from other parts of the eToro xlsx file.
-      fees: (rolloverFeesAndDividends < 0) ? rolloverFeesAndDividends : 0,
-      dividends: (rolloverFeesAndDividends > 0) ? rolloverFeesAndDividends : 0,
+      fees: fees?.entries.map((e) => Fee(date: e.key, amount: e.value)).toList(),
       type: transactionType,
       sourceCountry: CountryCode.parse(country ?? "US"),
       counterpartyCountry: CountryCode.US,
     );
+  }
+
+  void crossData(EtoroAccountActivities activities) {
+    addFees(activities);
+  }
+
+  void addFees(EtoroAccountActivities activities) {
+    activities.where((a) => a.type.toLowerCase().contains("fee") && a.positionId == positionId).forEach((f) {
+      fees ??= {};
+      fees![f.date] = f.amount;
+    });
   }
 }
